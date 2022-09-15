@@ -38,49 +38,20 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 25e3f28b-2aaa-4af9-a1bc-37afdf426f52
-  APIGatewayRestAPI:
-    Type: 'AWS::ApiGateway::RestApi'
-    Properties:
-      Name:
-        Ref: APIName
-      Description:
-        Ref: APIDesc
-      BinaryMediaTypes:
-        - image/jpeg
-        - multipart/form-data
-      
-    DependsOn:
-      - LambdaFunction
   APIGatewayResource:
     Type: 'AWS::ApiGateway::Resource'
     Properties:
-      RestApiId: !Ref APIGatewayRestAPI
-      ParentId: !GetAtt 
-        - APIGatewayRestAPI
-        - RootResourceId
-      PathPart:
-        Ref: ApiPathName
-    DependsOn:
-      - APIGatewayRestAPI
-  APIGatewayAuthorizer:
-    Type: 'AWS::ApiGateway::Authorizer'
-    Properties:
-      IdentitySource: method.request.header.Authorization
-      Name: CognitoAuthorizer
-      Type: COGNITO_USER_POOLS
-      ProviderARNs:
-        - !Ref CognitoARN
-      RestApiId: !Ref APIGatewayRestAPI
-    DependsOn:
-      - APIGatewayResource
+      RestApiId: !Ref RestApiId
+      ParentId:  !Ref ParentApiID
+      PathPart:  !Ref ApiPathName
   APIGatewayMethod:
     Type: 'AWS::ApiGateway::Method'
     Properties:
-      RestApiId: !Ref APIGatewayRestAPI
+      RestApiId: !Ref RestApiId
       ResourceId: !Ref APIGatewayResource
       HttpMethod: POST
       AuthorizationType: COGNITO_USER_POOLS
-      AuthorizerId: !Ref APIGatewayAuthorizer
+      AuthorizerId: !Ref AuthorizerID
       MethodResponses:
         - StatusCode: 200
       Integration:
@@ -114,12 +85,12 @@ Resources:
       ResourceId: !Ref APIGwResorceSessionIdPhotosAdd
       HttpMethod: PUT
       AuthorizationType: COGNITO_USER_POOLS
-      AuthorizerId: !Ref APIGatewayAuthorizer
+      AuthorizerId: !Ref AuthorizerID
       RequestParameters:
         method.request.path.proxy: true
         method.request.path.fileName : true
         method.request.header.tagging : false
-      RestApiId: !Ref APIGatewayRestAPI
+      RestApiId: !Ref RestApiId
       Integration:
         Type: AWS
         IntegrationHttpMethod: PUT
@@ -153,7 +124,7 @@ Resources:
       ResourceId: !Ref APIGwResorceSessionIdPhotosAdd
       HttpMethod: OPTIONS
       AuthorizationType: NONE      
-      RestApiId: !Ref APIGatewayRestAPI
+      RestApiId: !Ref RestApiId
       Integration:
         Type: MOCK
         IntegrationResponses:
@@ -180,86 +151,14 @@ Resources:
   APIGatewayDeployment:
     Type: 'AWS::ApiGateway::Deployment'
     Properties:
-      RestApiId: !Ref APIGatewayRestAPI
+      RestApiId: !Ref RestApiId
       StageName:
         Ref: EnvironmentName
     DependsOn:
       - APIGatewayMethod
       - ApiGwAny
       - ApiGwPhotoPut
-  APIGatewayPermission:
-    Type: 'AWS::Lambda::Permission'
-    Properties:
-      Action: 'lambda:InvokeFunction'
-      FunctionName: !GetAtt LambdaFunction.Arn
-      Principal: apigateway.amazonaws.com
-    DependsOn:
-      - APIGatewayDeployment
-  IAMRole:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - lambda.amazonaws.com
-            Action:
-              - 'sts:AssumeRole'
-      Path: /
-      Policies:
-        - PolicyName: Policy_api-lambda-db
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - 'dynamodb:BatchGetItem'
-                  - 'dynamodb:BatchWriteItem'
-                  - 'dynamodb:TagResource'
-                  - 'dynamodb:UntagResource'
-                  - 'dynamodb:PutItem'
-                  - 'dynamodb:DeleteItem'
-                  - 'dynamodb:GetItem'
-                  - 'dynamodb:Scan'
-                  - 'dynamodb:Query'
-                  - 'dynamodb:UpdateItem'
-                Resource: '*'
-              - Effect: Allow
-                Action:
-                  - 'logs:CreateLogStream'
-                  - 'logs:CreateLogGroup'
-                  - 'logs:PutLogEvents'
-                Resource: '*'
-              - Effect: Allow
-                Action:
-                  - 'ec2:DescribeNetworkInterfaces'
-                  - 'ec2:CreateNetworkInterface'
-                  - 'ec2:DeleteNetworkInterface'
-                  - 'ec2:DescribeInstances'
-                  - 'ec2:AttachNetworkInterface'
-                Resource: '*'
-              - Effect: Allow
-                Action:
-                  - 's3:PutObject'
-                  - 's3:GetObject'
-                  - 's3:PutObjectTagging'
-                Resource: 'arn:aws:s3:::photoevent/*'
-        - PolicyName: Policy_api-S3  
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:  
-              - Effect: Allow
-                Action:
-                  - 's3:PutObject'
-                  - 's3:GetObject'
-                  - 's3:ListBucket'
-                  - 's3:PutObjectTagging'
-                Resource: 
-                  - 'arn:aws:s3:::photoevent/*'
-                  - 'arn:aws:s3:::photoevent'    
-Parameters:
+  Parameters:
   LambdaFuncName:
     Type: String
     Default: lambda-Photo
@@ -269,15 +168,24 @@ Parameters:
   APIName:
     Type: String
     Default: API-Photo
-  ApiPathName:
-    Type: String
-    Default: Photo
   APIDesc:
     Type: String
     Default: Api dise?ada para los servicios de Photo.
   CognitoARN:
     Type: String
     Default: 'arn:aws:cognito-idp:us-west-2:547749462802:userpool/us-west-2_VCd4MZ9X8'
+  RestApiId:
+    Type: String
+    Default: 'gvvxnmd274'
+  ParentApiID:
+     Type: String
+    Default: '5ki8z8d5f7'
+  ApiPathName:
+    Type: String
+    Default: Photo
+  AuthorizerID:
+    Type: String
+    Default: 's286mk'
   EnvironmentName:
     Type: String
     Default: dev

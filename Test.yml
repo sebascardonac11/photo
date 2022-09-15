@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  APIGatewayResource:
+    Type: 'AWS::ApiGateway::Resource'
+    Properties:
+      RestApiId: gvvxnmd274
+      ParentId: !GetAtt 
+        - APIGatewayRestAPI
+        - RootResourceId
+      PathPart:
+        Ref: ApiPathName
+    DependsOn:
+      - APIGatewayRestAPI
+Parameters:
+  LambdaFuncName:
+    Type: String
+    Default: lambda-Photo
+  DynamoDBTableName:
+    Type: String
+    Default: dynamo-Photo
+  APIName:
+    Type: String
+    Default: API-Photo
+  ApiPathName:
+    Type: String
+    Default: Photo
+  APIDesc:
+    Type: String
+    Default: Api dise?ada para los servicios de Photo.
+  CognitoARN:
+    Type: String
+    Default: 'arn:aws:cognito-idp:us-west-2:547749462802:userpool/us-west-2_VCd4MZ9X8'
+  EnvironmentName:
+    Type: String
+    Default: dev
+
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  APIGatewayResource:
+    Type: 'AWS::ApiGateway::Resource'
+    Properties:
+      RestApiId: 'gvvxnmd274'
+      ParentId: '5ki8z8d5f7'
+      PathPart: 'photo'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 0604be9b-f400-4cd2-bfe3-22680d5ac0f2
