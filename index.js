@@ -20,7 +20,7 @@ exports.handler = async function (event, context, callback) {
         const Key = Record.s3.object.key;
         const user = Record.userIdentity;
         const bucketName = Record.s3.bucket.name;
-        photo.analyzePhoto(bucketName,Key);
+        response = await photo.analyzePhoto(bucketName,Key);
       });
 
   }

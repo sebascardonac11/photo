@@ -71,13 +71,14 @@ module.exports = class Photo {
                         }]
                 }
             };
+            console.log("Etiquetas",params2)
             var response =s3.putObjectTagging(params2, function (err, data) { if (err) console.log(err, err.stack); });
             return {
                 statusCode: 200,
                 data: response
             }
         } catch (error) {
-            console.log("Something wrong in photo.putPhoto: ", error)
+            console.log("Something wrong in photo.analyzePhoto: ", error)
             return {
                 statusCode: 404,
                 data: error
