@@ -45,7 +45,7 @@ module.exports = class Photo {
                 TableName: this.DYNAMODBTABLE,
                 Item: Item
             }
-            return await dynamo.putItem(params).promise();
+            return await dynamo.put(params).promise();
         } catch (error) {
             console.log("Something wrong in photo.insertPhotoDB: ", error);
         }
