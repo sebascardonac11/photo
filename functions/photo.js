@@ -3,6 +3,11 @@ const s3Client = new AWS.S3();
 const dynamo = new AWS.DynamoDB.DocumentClient();
 
 module.exports = class Photo {
+    BUCKET;
+    constructor(bucket) {
+        this.BUCKET = bucket;
+      }
+
     async putPhoto(fileName, contentType, body, email,event,session) {
         try {
             var filePath = "photoClient/" +event+"/"+session+"/"+ fileName

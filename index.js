@@ -3,7 +3,8 @@ const jwt_decode = require('jwt-decode');
 const parser = require('lambda-multipart-parser');
 exports.handler = async function (event, context, callback) {
     console.log("Event Photo: ", event);
-    var photo = new Photo();
+    console.log("Variables de entorno: ",process.env.BUCKET);
+    var photo = new Photo(process.env.BUCKET);
     var response={statusCode: 401,data: "Whitout Information"};
     var authorizationDecoded = jwt_decode(event.headers.Authorization);
     switch (event.httpMethod) {
