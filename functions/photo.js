@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk');
 const s3Client = new AWS.S3();
-AWS.config.update({ region: 'us-east-2' });
+//AWS.config.update({ region: 'us-east-2' });
 const dynamo = new AWS.DynamoDB.DocumentClient();
 
 const AnalyzePhoto = require('./analyzePhoto')
