@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk');
 const s3Client = new AWS.S3();
-//AWS.config.update({ region: 'us-east-2' });
+AWS.config.update({ region: 'us-east-2' });
 const dynamo = new AWS.DynamoDB.DocumentClient();
 
 const AnalyzePhoto = require('./analyzePhoto')
@@ -58,7 +58,7 @@ module.exports = class Photo {
             var detectPhotos = new AnalyzePhoto(bucketName, Key);
             var labels = await detectPhotos.getLabel();
             var texts = await detectPhotos.getText();
-            var params2 = {
+            var params = {
                 Bucket: bucketName,
                 Key: Key,
                 Tagging: {
@@ -73,8 +73,8 @@ module.exports = class Photo {
                         }]
                 }
             };
-            console.log("Etiquetas",params2)
-            var response =s3Client.putObjectTagging(params2, function (err, data) { if (err) console.log(err, err.stack); });
+            console.log("Etiquetas",JSON.stringify(params));
+            var response =s3Client.putObjectTagging(params, function (err, data) { if (err) console.log(err, err.stack); });
             return {
                 statusCode: 200,
                 data: response
