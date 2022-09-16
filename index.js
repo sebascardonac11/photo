@@ -6,7 +6,8 @@ exports.handler = async function (event, context, callback) {
     var photo = new Photo();
     var authorizationDecoded = jwt_decode(event.headers.Authorization);
     this.response.statusCode=401;
-    switch (event.httpMethod) {
+    this.response.data="Testing"
+    /*switch (event.httpMethod) {
         case 'PUT':
             console.log("### PUT ####");
             const form = await parser.parse(event);
@@ -17,7 +18,7 @@ exports.handler = async function (event, context, callback) {
             break;
         default:
               console.log("Without httpMethod");
-    }
+    }*/
     console.log("Response: ", this.response);
     return {
       statusCode: this.response.statusCode,
