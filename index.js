@@ -18,11 +18,10 @@ exports.handler = async function (event, context, callback) {
     default:
       event.Records.forEach(async Record => {
         const Key = Record.s3.object.key;
-        const user = Record.userIdentity;
         const bucketName = Record.s3.bucket.name;
         response = await photo.analyzePhoto(bucketName,Key);
       });
-
+      break;
   }
   console.log("Response: ", response);
   return {
