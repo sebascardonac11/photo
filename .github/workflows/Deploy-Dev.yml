@@ -32,6 +32,9 @@ jobs:
           aws lambda update-function-code \
             --function-name ${{ secrets.LAMBDAFUNCNAME }} \
             --zip-fil "fileb://./deploy.zip" \
+      - name: Updating Function 
+        run: |
+          sleep 10
       - name: Configutation
         run: |
           aws lambda update-function-configuration --function-name ${{ secrets.LAMBDAFUNCNAME }} \
