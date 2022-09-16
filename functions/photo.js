@@ -4,15 +4,17 @@ const dynamo = new AWS.DynamoDB.DocumentClient();
 
 module.exports = class Photo {
     BUCKET;
-    constructor(bucket) {
+    DYNAMODBTABLE;
+    constructor(bucket,table) {
         this.BUCKET = bucket;
+        this.DYNAMODBTABLE = table
       }
 
     async putPhoto(fileName, contentType, body, email,event,session) {
         try {
             var filePath = "photoClient/" +event+"/"+session+"/"+ fileName
             var params = {
-                Bucket: "photoevent",
+                Bucket: this.BUCKET,
                 Body: body,
                 Key: filePath,
                 ContentType: contentType,
@@ -40,7 +42,7 @@ module.exports = class Photo {
     async insertPhotoDB(Item) {
         try {
             var params = {
-                TableName: "photoEvent-Dynamo-photo",
+                TableName: this.DYNAMODBTABLE,
                 Item: Item
             }
             var result = await dynamo.put(params).promise();
