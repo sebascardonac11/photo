@@ -15,6 +15,8 @@ exports.handler = async function (event, context, callback) {
             var body = Buffer.from(form.files[0].content);
             this.response = await photo.putPhoto(key, contenType, body, authorizationDecoded.email);
             break;
+        default:
+              console.log("Without httpMethod");
     }
     console.log("Response: ", this.response);
     return {
