@@ -20,7 +20,9 @@ exports.handler = async function (event, context, callback) {
         const Key = Record.s3.object.key;
         const bucketName = Record.s3.bucket.name;
         response = await photo.analyzePhoto(bucketName,Key);
+        console.log("Photo processed", response);
       });
+      return;
       break;
   }
   console.log("Response: ", response);
