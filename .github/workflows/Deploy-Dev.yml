@@ -32,3 +32,4 @@ jobs:
           aws lambda update-function-code \
             --function-name ${{ secrets.LAMBDAFUNCNAME }} \
             --zip-fil "fileb://./deploy.zip" \
+            --environment "Variables={DYNAMODB=photoEvent-Dynamo-photo,BUCKET=photoevent}"
