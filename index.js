@@ -4,11 +4,9 @@ const parser = require('lambda-multipart-parser');
 exports.handler = async function (event, context, callback) {
     console.log("Event Photo: ", event);
     var photo = new Photo();
-    var response;
+    var response={statusCode: 401,data: "Testing"};
     var authorizationDecoded = jwt_decode(event.headers.Authorization);
-    response.statusCode=401;
-    response.data="Testing"
-    /*switch (event.httpMethod) {
+    switch (event.httpMethod) {
         case 'PUT':
             console.log("### PUT ####");
             const form = await parser.parse(event);
@@ -19,7 +17,7 @@ exports.handler = async function (event, context, callback) {
             break;
         default:
               console.log("Without httpMethod");
-    }*/
+    }
     console.log("Response: ", response);
     return {
       statusCode: response.statusCode,
