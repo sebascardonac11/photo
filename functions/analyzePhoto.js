@@ -23,12 +23,12 @@ function analyzePhoto(bucket, photo) {
       } else {
         console.log("Labels: ", JSON.stringify(response));
       } });
-     console.log("Labels",data);
+     /*console.log("Labels",data);
       data.Labels.forEach(label => {
         if (labelsTags.search(label.Name) == -1)
           labelsTags += label.Name + "-";
-      });
-      return labelsTags;
+      });*/
+      return null;
     } catch (error) {
       console.log("Something wrong in analyzePhoto.getLabel: ", error)
     }
