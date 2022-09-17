@@ -16,8 +16,14 @@ function analyzePhoto(bucket, photo) {
       }
       var labelsTags = ""
       console.log("labels: ", params);
-      const data = await client.detectLabels(params, function (err, data) { if (err) console.log(err, err.stack); }).promise();
-      console.log("Labels",data);
+     // const data = await client.detectLabels(params, function (err, data) { if (err) console.log(err, err.stack); }).promise();
+     client.detectLabels(params, function(err, response) {
+      if (err) {
+        console.log(err, err.stack); // if an error occurred
+      } else {
+        console.log("Labels: ", JSON.stringify(response));
+      } });
+     console.log("Labels",data);
       data.Labels.forEach(label => {
         if (labelsTags.search(label.Name) == -1)
           labelsTags += label.Name + "-";
