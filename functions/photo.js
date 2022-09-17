@@ -57,7 +57,7 @@ module.exports = class Photo {
             var detectPhotos = new AnalyzePhoto(bucketName, Key);
             console.log("Analysing key: ", detectPhotos.bucket);
             var labels = await detectPhotos.getLabel();
-            console,log("Labels: ",labels);
+            //console.log("Labels: ",labels);
             var texts = await detectPhotos.getText();
             var params = {
                 Bucket: bucketName,
