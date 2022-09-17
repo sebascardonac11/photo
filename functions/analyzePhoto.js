@@ -15,6 +15,7 @@ function analyzePhoto(bucket, photo) {
         MaxLabels: 10
       }
       var labelsTags = ""
+      console.log("labels: ", params);
       const data = await client.detectLabels(params).promise();
       console.log("Labels",data);
       data.Labels.forEach(label => {
