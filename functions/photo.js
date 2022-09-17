@@ -74,11 +74,11 @@ module.exports = class Photo {
                         }]
                 }
             };
-            console.log("Etiquetas",JSON.stringify(params));
-            var response =s3Client.putObjectTagging(params, function (err, data) { if (err) console.log(err, err.stack); });
+            //console.log("Etiquetas",JSON.stringify(params));
+            //var response =s3Client.putObjectTagging(params, function (err, data) { if (err) console.log(err, err.stack); });
             return {
                 statusCode: 200,
-                data: response
+                data: ''
             }
         } catch (error) {
             console.log("Something wrong in photo.analyzePhoto: ", error)
