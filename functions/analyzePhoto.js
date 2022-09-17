@@ -28,7 +28,7 @@ function analyzePhoto(bucket, photo) {
         if (labelsTags.search(label.Name) == -1)
           labelsTags += label.Name + "-";
       });*/
-      return null;
+      return "[]";
     } catch (error) {
       console.log("Something wrong in analyzePhoto.getLabel: ", error)
     }
