@@ -2,7 +2,7 @@ const Photo = require('./functions/photo')
 const jwt_decode = require('jwt-decode');
 const parser = require('lambda-multipart-parser');
 exports.handler = async function (event, context, callback) {
-  //console.log("Event Photo: ", JSON.stringify(event));
+  console.log("Event Photo: ", JSON.stringify(event));
   var photo = new Photo(process.env.BUCKET, process.env.DYNAMODB);
   var response = { statusCode: 401, data: "Whitout Information" };
   switch (event.httpMethod) {
