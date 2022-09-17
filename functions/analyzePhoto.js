@@ -17,7 +17,7 @@ function analyzePhoto(bucket, photo) {
       var labelsTags = ""
       console.log("labels: ", params);
      // const data = await client.detectLabels(params, function (err, data) { if (err) console.log(err, err.stack); }).promise();
-     client.detectLabels(params, function(err, response) {
+     const data = await client.detectLabels(params, function(err, response) {
       if (err) {
         console.log(err, err.stack); // if an error occurred
       } else {
