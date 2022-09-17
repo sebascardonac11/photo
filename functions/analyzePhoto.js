@@ -23,8 +23,8 @@ function analyzePhoto(bucket, photo) {
       } else {
         console.log("Labels: ", JSON.stringify(response));
       } }).promise();
-     /*console.log("Labels",data);
-      data.Labels.forEach(label => {
+     console.log("Labels",data);
+     /* data.Labels.forEach(label => {
         if (labelsTags.search(label.Name) == -1)
           labelsTags += label.Name + "-";
       });*/
