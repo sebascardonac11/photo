@@ -23,9 +23,7 @@ exports.handler = async function (event, context, callback) {
         //const bucket = Record.s3.bucket.name; // the bucketname without s3://
         //const photo = Record.s3.object.key; // the name of file
         const config = new AWS.Config({
-          accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-          region: process.env.AWS_REGION
+          region: 'us-east-2'
         }) 
         const client = new AWS.Rekognition();
         const params = {
