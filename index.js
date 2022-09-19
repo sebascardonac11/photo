@@ -32,6 +32,7 @@ exports.handler = async function (event, context, callback) {
           },
           MaxLabels: 10
         }
+        console.log("Antes de procesar");
         const data = await client.detectLabels(params).promise();
         console.log("Photo processed", data);
         //const Key = Record.s3.object.key;

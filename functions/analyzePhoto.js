@@ -15,20 +15,13 @@ function analyzePhoto(bucket, photo) {
         MaxLabels: 10
       }
       var labelsTags = "";
-     // const data = await client.detectLabels(params, function (err, data) { if (err) console.log(err, err.stack); }).promise();
-     const data = await client.detectLabels(params, function(err, response) {
-      console.log("Llego de labels");
-      if (err) {
-        console.log(err, err.stack); // if an error occurred
-      } else {
-        console.log("Labels: ", JSON.stringify(response));
-      } }).promise();
+      const data = await client.detectLabels(params, function (err, data) { if (err) console.log(err, err.stack); }).promise();
      console.log("Labels",data);
-     /* data.Labels.forEach(label => {
+      data.Labels.forEach(label => {
         if (labelsTags.search(label.Name) == -1)
           labelsTags += label.Name + "-";
-      });*/
-      return "[]";
+      });
+      return labelsTags;
     } catch (error) {
       console.log("Something wrong in analyzePhoto.getLabel: ", error)
     }
