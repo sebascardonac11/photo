@@ -3,6 +3,7 @@ const jwt_decode = require('jwt-decode');
 const parser = require('lambda-multipart-parser');
 
 var AWS = require('aws-sdk');
+AWS.config.update({ region: 'us-east-2' });
 
 exports.handler = async function (event, context, callback) {
   console.log("Event Photo: ", JSON.stringify(event));
@@ -20,10 +21,23 @@ exports.handler = async function (event, context, callback) {
       break;
     default:
       event.Records.forEach(async Record => {
-        const bucketName = Record.s3.bucket.name;
+        const client = new AWS.Rekognition();
+        const params = {
+          Image: {
+            S3Object: {
+              Bucket: 'photoeventdev',
+              Name: 'photoClient/SCC_0032.jpg'
+            },
+          },
+          MaxLabels: 10
+        }
+        console.log("Antes de procesar");
+        const data = await client.detectLabels(params).promise();
+        console.log("Photo processed", data);
+        /*const bucketName = Record.s3.bucket.name;
         const Key = Record.s3.object.key;
         response = await photo.analyzePhoto(bucketName, Key);
-        console.log("Photo processed", response);
+        console.log("Photo processed", response);*/
       });
       return;
       break;
