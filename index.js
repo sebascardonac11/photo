@@ -1,10 +1,6 @@
 const Photo = require('./functions/photo')
 const jwt_decode = require('jwt-decode');
 const parser = require('lambda-multipart-parser');
-
-var AWS = require('aws-sdk');
-AWS.config.update({ region: 'us-east-2' });
-
 exports.handler = async function (event, context, callback) {
   //console.log("Event Photo: ", JSON.stringify(event));
   var photo = new Photo(process.env.BUCKET, process.env.DYNAMODB);
@@ -24,7 +20,6 @@ exports.handler = async function (event, context, callback) {
         const bucketName = event.Records[i].s3.bucket.name;
         const Key = event.Records[i].s3.object.key;
         response = await photo.analyzePhoto(bucketName, Key);
-        console.log("Photo processed", response);
       }
       return;
       break;

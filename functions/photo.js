@@ -60,7 +60,7 @@ module.exports = class Photo {
             var params = {
                 Bucket: bucketName,
                 Key: Key,
-                Tagging: {
+               /* Tagging: {
                     TagSet: [
                         {
                             Key: "Labels",
@@ -70,10 +70,12 @@ module.exports = class Photo {
                             Key: "Texts",
                             Value: texts
                         }]
-                }
+                }*/
             };
-            var response =await s3Client.putObjectTagging(params).promise();
-            console.log("Etiquetas ",response);
+            var tagging =await s3Client.getObjectTagging(params).promise();
+            console.log("Tagging: ",tagging);
+            //params.Tagging=
+            //await s3Client.putObjectTagging(params).promise();
             return {
                 statusCode: 200,
                 data: ''

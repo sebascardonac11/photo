@@ -1,5 +1,4 @@
 const AWS = require('aws-sdk')
-AWS.config.update({ region: 'us-east-2' });
 function analyzePhoto(bucket, photo) {
   this.bucket = bucket;
   this.photo = photo;
