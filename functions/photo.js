@@ -73,7 +73,7 @@ module.exports = class Photo {
                 }
             };
             var response =s3Client.putObjectTagging(params, function (err, data) { if (err) console.log(err, err.stack); });
-            console.log("Etiquetas ",JSON.stringify(response));
+            console.log("Etiquetas ",response);
             return {
                 statusCode: 200,
                 data: ''
