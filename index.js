@@ -21,8 +21,8 @@ exports.handler = async function (event, context, callback) {
       break;
     default:
       for (const i in event.Records) {
-        const bucketName = Records[i].s3.bucket.name;
-        const Key = Records[i].s3.object.key;
+        const bucketName = event.Records[i].s3.bucket.name;
+        const Key = event.Records[i].s3.object.key;
         response = await photo.analyzePhoto(bucketName, Key);
         console.log("Photo processed", response);
       }
