@@ -4,6 +4,8 @@ const parser = require('lambda-multipart-parser');
 
 var AWS = require('aws-sdk');
 
+AWS.config.update({ region: 'us-east-2' });
+
 exports.handler = async function (event, context, callback) {
   console.log("Event Photo: ", JSON.stringify(event));
   var photo = new Photo(process.env.BUCKET, process.env.DYNAMODB);
@@ -22,9 +24,6 @@ exports.handler = async function (event, context, callback) {
      // event.Records.forEach(async Record => {
         //const bucket = Record.s3.bucket.name; // the bucketname without s3://
         //const photo = Record.s3.object.key; // the name of file
-        const config = new AWS.Config({
-          region: 'us-east-2'
-        }) 
         const client = new AWS.Rekognition();
         const params = {
           Image: {
