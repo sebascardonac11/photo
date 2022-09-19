@@ -21,7 +21,8 @@ exports.handler = async function (event, context, callback) {
       break;
     default:
       const client = new AWS.Rekognition();
-     // event.Records.forEach(async Record => {
+      event.Records.forEach(async Record => {
+        console.log('Bucket',Record.s3.bucket.name);
         const params = {
           Image: {
             S3Object: {
@@ -38,7 +39,7 @@ exports.handler = async function (event, context, callback) {
         const Key = Record.s3.object.key;
         response = await photo.analyzePhoto(bucketName, Key);
         console.log("Photo processed", response);*/
-      //});
+      });
       return;
       break;
   }
