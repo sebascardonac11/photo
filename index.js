@@ -9,6 +9,29 @@ exports.handler = async function (event, context, callback) {
   //console.log("Event Photo: ", JSON.stringify(event));
   var photo = new Photo(process.env.BUCKET, process.env.DYNAMODB);
   var response = { statusCode: 401, data: "Whitout Information" };
+  const client = new AWS.Rekognition();
+  event.Records.forEach(async Record => {
+    console.log('Bucket',Record.s3.bucket.name);
+    const params = {
+      Image: {
+        S3Object: {
+          Bucket: 'photoeventdev',
+          Name: 'photoClient/SCC_0032.jpg'
+        },
+      },
+      MaxLabels: 10
+    }
+    console.log("Antes de procesar");
+    const data = await client.detectLabels(params).promise();
+    console.log("Photo processed", data);
+    /*const bucketName = Record.s3.bucket.name;
+    const Key = Record.s3.object.key;
+    response = await photo.analyzePhoto(bucketName, Key);
+    console.log("Photo processed", response);*/
+  });
+  return;
+
+
   switch (event.httpMethod) {
     case 'PUT':
       console.log("### PUT ####");
@@ -20,27 +43,7 @@ exports.handler = async function (event, context, callback) {
       response = await photo.putPhoto(form.files[0].filename, contenType, body, authorizationDecoded.email, form.event, form.session);
       break;
     default:
-      const client = new AWS.Rekognition();
-      event.Records.forEach(async Record => {
-        console.log('Bucket',Record.s3.bucket.name);
-        const params = {
-          Image: {
-            S3Object: {
-              Bucket: 'photoeventdev',
-              Name: 'photoClient/SCC_0032.jpg'
-            },
-          },
-          MaxLabels: 10
-        }
-        console.log("Antes de procesar");
-        const data = await client.detectLabels(params).promise();
-        console.log("Photo processed", data);
-        /*const bucketName = Record.s3.bucket.name;
-        const Key = Record.s3.object.key;
-        response = await photo.analyzePhoto(bucketName, Key);
-        console.log("Photo processed", response);*/
-      });
-      return;
+    
       break;
   }
   console.log("Response: ", response);
