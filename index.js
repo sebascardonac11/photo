@@ -20,29 +20,12 @@ exports.handler = async function (event, context, callback) {
       response = await photo.putPhoto(form.files[0].filename, contenType, body, authorizationDecoded.email, form.event, form.session);
       break;
     default:
-      const client = new AWS.Rekognition();
       for (const i in event.Records) {
-        console.log('Bucket', event.Records[i].s3.bucket.name);
-        const params = {
-          Image: {
-            S3Object: {
-              Bucket: 'photoeventdev',
-              Name: 'photoClient/SCC_0032.jpg'
-            },
-          },
-          MaxLabels: 10
-        }
-        console.log("Antes de procesar");
-        const data = await client.detectLabels(params).promise();
-        console.log("Photo processed", data);
+        const bucketName = Records[i].s3.bucket.name;
+        const Key = Records[i].s3.object.key;
+        response = await photo.analyzePhoto(bucketName, Key);
+        console.log("Photo processed", response);
       }
-      //event.Records.forEach(async Record => {
-
-      /*const bucketName = Record.s3.bucket.name;
-      const Key = Record.s3.object.key;
-      response = await photo.analyzePhoto(bucketName, Key);
-      console.log("Photo processed", response);*/
-      //});
       return;
       break;
   }
