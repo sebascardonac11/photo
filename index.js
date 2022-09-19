@@ -6,7 +6,7 @@ var AWS = require('aws-sdk');
 AWS.config.update({ region: 'us-east-2' });
 
 exports.handler = async function (event, context, callback) {
-  console.log("Event Photo: ", JSON.stringify(event));
+  //console.log("Event Photo: ", JSON.stringify(event));
   var photo = new Photo(process.env.BUCKET, process.env.DYNAMODB);
   var response = { statusCode: 401, data: "Whitout Information" };
   switch (event.httpMethod) {
@@ -20,8 +20,8 @@ exports.handler = async function (event, context, callback) {
       response = await photo.putPhoto(form.files[0].filename, contenType, body, authorizationDecoded.email, form.event, form.session);
       break;
     default:
-      event.Records.forEach(async Record => {
-        const client = new AWS.Rekognition();
+      const client = new AWS.Rekognition();
+     // event.Records.forEach(async Record => {
         const params = {
           Image: {
             S3Object: {
@@ -38,7 +38,7 @@ exports.handler = async function (event, context, callback) {
         const Key = Record.s3.object.key;
         response = await photo.analyzePhoto(bucketName, Key);
         console.log("Photo processed", response);*/
-      });
+      //});
       return;
       break;
   }
