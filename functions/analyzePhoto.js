@@ -17,7 +17,6 @@ function analyzePhoto(bucket, photo) {
       }
       var labelsTags = "";
       const data = await client.detectLabels(params, function (err, data) { if (err) console.log(err, err.stack); }).promise();
-     console.log("Labels",data);
       data.Labels.forEach(label => {
         if (labelsTags.search(label.Name) == -1)
           labelsTags += label.Name + "-";
