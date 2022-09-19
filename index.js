@@ -32,15 +32,10 @@ exports.handler = async function (event, context, callback) {
           },
           MaxLabels: 10
         }
-        client.detectLabels(params, function(err, response) {
-          if (err) {
-            console.log(err, err.stack); // if an error occurred
-          } else {
-            console.log(JSON.stringify(response));
-          }
-        })
-        const Key = Record.s3.object.key;
-        const bucketName = Record.s3.bucket.name;
+        const data = await client.detectLabels(params).promise();
+        console.log("Photo processed", data);
+        //const Key = Record.s3.object.key;
+       // const bucketName = Record.s3.bucket.name;
         //response = await photo.analyzePhoto(bucketName, Key);
         console.log("Photo processed", response);
       });
