@@ -55,9 +55,7 @@ module.exports = class Photo {
     async analyzePhoto(bucketName, Key) {
         try {
             var detectPhotos = new AnalyzePhoto(bucketName, Key);
-            console.log("Analysing key: ", detectPhotos.bucket);
             var labels = await detectPhotos.getLabel();
-            //console.log("Labels: ",labels);
             var texts = await detectPhotos.getText();
             var params = {
                 Bucket: bucketName,
@@ -74,8 +72,8 @@ module.exports = class Photo {
                         }]
                 }
             };
-            console.log("Etiquetas",JSON.stringify(params));
             var response =s3Client.putObjectTagging(params, function (err, data) { if (err) console.log(err, err.stack); });
+            console.log("Etiquetas ",JSON.stringify(response));
             return {
                 statusCode: 200,
                 data: ''
