@@ -38,4 +38,4 @@ jobs:
       - name: Configutation
         run: |
           aws lambda update-function-configuration --function-name ${{ secrets.LAMBDAFUNCNAME }} \
-            --environment "Variables={DYNAMODB=photoEvent-Dynamo-photo,BUCKET=photoevent}" 
+            --environment "Variables={DYNAMODB=photoEvent-Dynamo-photo,BUCKET=photoeventdev}" 
