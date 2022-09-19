@@ -22,7 +22,7 @@ exports.handler = async function (event, context, callback) {
     default:
       const client = new AWS.Rekognition();
       for (const i in event.Records) {
-        console.log('Bucket', event.Record[i].s3.bucket.name);
+        console.log('Bucket', event.Records[i].s3.bucket.name);
         const params = {
           Image: {
             S3Object: {
