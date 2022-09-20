@@ -59,8 +59,11 @@ module.exports = class Photo {
             var texts = await detectPhotos.getText();
             var params = {
                 Bucket: bucketName,
-                Key: Key,
-               /* Tagging: {
+                Key: Key
+            };
+            var tagging =await s3Client.getObjectTagging(params).promise();
+            if(tagging.TagSet.length == 0 ){
+                params.Tagging={
                     TagSet: [
                         {
                             Key: "Labels",
@@ -70,15 +73,13 @@ module.exports = class Photo {
                             Key: "Texts",
                             Value: texts
                         }]
-                }*/
-            };
-            var tagging =await s3Client.getObjectTagging(params).promise();
-            console.log("Tagging: ",tagging);
-            //params.Tagging=
-            //await s3Client.putObjectTagging(params).promise();
+                }
+                console.log("Tagging: ",params);
+                await s3Client.putObjectTagging(params).promise();
+            }
             return {
                 statusCode: 200,
-                data: ''
+                data: '{label:{'+labels+'},text:{'+texts+'} }'
             }
         } catch (error) {
             console.log("Something wrong in photo.analyzePhoto: ", error)
