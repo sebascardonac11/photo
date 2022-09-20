@@ -74,7 +74,6 @@ module.exports = class Photo {
                             Value: texts
                         }]
                 }
-                console.log("Tagging: ",params);
                 await s3Client.putObjectTagging(params).promise();
             }
             return {
