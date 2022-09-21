@@ -28,6 +28,7 @@ jobs:
           stack-name: 'photoevent'
           template: './Test.yml'
           aws-region: ${{ secrets.AWS_REGION }}
+          apply-change-set: ${{ github.event_name != 'pull_request' && github.event_name != 'repository_dispatch' }}
           # Only apply the changeset on pushes to main/release
           parameters: 'EnvironmentName=$enviromentName'
       - name: Variable
