@@ -11,22 +11,6 @@ Resources:
       #  - Event: 's3:ObjectCreated:*'
       #  - Filter: 
       #  - Function: !GetAtt LambdaFunctionPhoto.Arn
-  BucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    DependsOn:
-      - BucketS3
-      - CloudFrontOriginIdentity
-    Properties:
-      Bucket: !Ref BucketName
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              AWS: !Sub 'arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CloudFrontOriginIdentity}'
-            Action: 's3:GetObject'
-            Resource: 
-              - !Sub "arn:aws:s3:::${BucketName}/*"
 Parameters:
   EnvironmentName:
     Type: String
