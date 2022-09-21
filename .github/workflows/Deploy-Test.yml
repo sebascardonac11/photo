@@ -1,0 +1,56 @@
+name: Deploy Photo Development
+on:
+  push:
+    branches:
+    - feature/testInfra
+env:
+  enviromentName: QA
+jobs:
+  Infra:
+    runs-on: ubuntu-latest
+    environment:
+      name: QA
+      url: https://d3ri3uhvzvztpt.cloudfront.net/
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: CloudFormation Stack
+        id: manage-stack
+        uses: badsyntax/github-action-aws-cloudformation@master
+        with:
+          stack-name: 'photoevent'
+          template: './Test.yml'
+          # Only apply the changeset on pushes to main/release
+          parameters: 'EnvironmentName=$enviromentName'
+      - name: Variable
+        run: |
+          # Now that the stack is created we can deploy our
+          # website to the S3 bucket.
+          echo "Domain of cloudFront: $Domain"
+        env:
+          # Use outputs from the CloudFormation Stack
+          Domain: ${{ steps.manage-stack.outputs.Domain }}
+  Deployment:
+    #needs: Infra
+    runs-on: ubuntu-latest
+    environment:
+      name: QA
+      url: https://d3ri3uhvzvztpt.cloudfront.net/
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - name: Variable
+        run: |
+          # Now that the stack is created we can deploy our
+          # website to the S3 bucket.
+          echo "Domain of cloudFront: $Domain"
+        env:
+          # Use outputs from the CloudFormation Stack
+          Domain: ${{ jobs.Infra.steps.manage-stack.outputs.Domain }}

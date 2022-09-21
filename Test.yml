@@ -1,47 +1,77 @@
 AWSTemplateFormatVersion: 2010-09-09
 Resources:
-  APIGatewayResource:
-    Type: 'AWS::ApiGateway::Resource'
+################## FRONT & BASE ##################
+  BucketS3:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
     Properties:
-      RestApiId: gvvxnmd274
-      ParentId: !GetAtt 
-        - APIGatewayRestAPI
-        - RootResourceId
-      PathPart:
-        Ref: ApiPathName
+      BucketName : !Ref BucketName
+      #NotificationConfiguration:
+      #  LambdaConfigurations:
+      #  - Event: 's3:ObjectCreated:*'
+      #  - Filter: 
+      #  - Function: !GetAtt LambdaFunctionPhoto.Arn
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
     DependsOn:
-      - APIGatewayRestAPI
+      - BucketS3
+      - CloudFrontOriginIdentity
+    Properties:
+      Bucket: !Ref BucketName
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CloudFrontOriginIdentity}'
+            Action: 's3:GetObject'
+            Resource: 
+              - !Sub "arn:aws:s3:::${BucketName}/*"
+  CloudFrontOriginIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: 'origin identity'
+  CloudFront:
+    Type: AWS::CloudFront::Distribution
+    DependsOn:
+      - BucketS3   
+    Properties:
+      DistributionConfig:
+        Enabled: 'true'
+        Comment: Sitio web para el portal de fotos en trackday
+        Origins:
+          - DomainName: !GetAtt BucketS3.DomainName
+            OriginPath: ''
+            Id: !Ref BucketS3
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOriginIdentity}'
+        DefaultRootObject: index.html
+        DefaultCacheBehavior:
+          AllowedMethods:
+          - GET
+          - HEAD
+          Compress: true
+          TargetOriginId: !Ref BucketS3
+          ForwardedValues:
+            QueryString: 'false'
+            Cookies:
+              Forward: none
+          ViewerProtocolPolicy: redirect-to-https    
+      Tags:
+        - Key: Proyect
+          Value: PhotoEven
 Parameters:
-  LambdaFuncName:
-    Type: String
-    Default: lambda-Photo
-  DynamoDBTableName:
-    Type: String
-    Default: dynamo-Photo
-  APIName:
-    Type: String
-    Default: API-Photo
-  ApiPathName:
-    Type: String
-    Default: Photo
-  APIDesc:
-    Type: String
-    Default: Api dise?ada para los servicios de Photo.
-  CognitoARN:
-    Type: String
-    Default: 'arn:aws:cognito-idp:us-west-2:547749462802:userpool/us-west-2_VCd4MZ9X8'
   EnvironmentName:
     Type: String
     Default: dev
-
-AWSTemplateFormatVersion: 2010-09-09
-Resources:
-  APIGatewayResource:
-    Type: 'AWS::ApiGateway::Resource'
-    Properties:
-      RestApiId: 'gvvxnmd274'
-      ParentId: '5ki8z8d5f7'
-      PathPart: 'photo'
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: 0604be9b-f400-4cd2-bfe3-22680d5ac0f2
+  BucketName:
+    Type: String
+    Default: photoeventdev
+Outputs:
+  BucketS3ARL:
+    Description: Arn de bucketS3
+    Value: !GetAtt BucketS3.Arn
+  Domain:
+    Description: URL del cloudFront Distribution
+    Value: !GetAtt CloudFront.DomainName
