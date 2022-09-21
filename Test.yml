@@ -27,7 +27,7 @@ Resources:
             Action: 's3:GetObject'
             Resource: 
               - !Sub "arn:aws:s3:::${BucketName}/*"
-  Parameters:
+Parameters:
   EnvironmentName:
     Type: String
     Default: dev
