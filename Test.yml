@@ -42,7 +42,7 @@ Resources:
         Comment: Sitio web para el portal de fotos en trackday
         Origins:
           - DomainName: !GetAtt BucketS3.DomainName
-            OriginPath: 'frontEnd'
+            OriginPath: '/frontEnd'
             Id: !Ref BucketS3
             S3OriginConfig:
               OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOriginIdentity}'
