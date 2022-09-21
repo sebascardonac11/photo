@@ -35,7 +35,7 @@ Resources:
   CloudFront:
     Type: AWS::CloudFront::Distribution
     DependsOn:
-      - BucketS3   
+      - BucketPolicy   
     Properties:
       DistributionConfig:
         Enabled: 'true'
