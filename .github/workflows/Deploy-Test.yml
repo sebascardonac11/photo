@@ -11,6 +11,8 @@ jobs:
     environment:
       name: QA
       url: https://d3ri3uhvzvztpt.cloudfront.net/
+    outputs:
+      Domain: ${{ steps.manage-stack.outputs.Domain }}
     steps:
       - uses: actions/checkout@v2
       - name: Configure AWS Credentials
@@ -32,25 +34,15 @@ jobs:
           # Now that the stack is created we can deploy our
           # website to the S3 bucket.
           echo "Domain of cloudFront: $Domain"
+          echo '::set-output name=Domain::${{ steps.manage-stack.outputs.Domain }}'
         env:
           # Use outputs from the CloudFormation Stack
           Domain: ${{ steps.manage-stack.outputs.Domain }}
   Deployment:
-    #needs: Infra
+    needs: Infra
     runs-on: ubuntu-latest
     environment:
       name: QA
       url: https://d3ri3uhvzvztpt.cloudfront.net/
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-      - name: Variable
-        run: |
-          # Now that the stack is created we can deploy our
-          # website to the S3 bucket.
-          echo "Domain of cloudFront: $Domain"
-        env:
-          # Use outputs from the CloudFormation Stack
-          Domain: ${{ jobs.Infra.steps.manage-stack.outputs.Domain }}
+      - run: echo ${{needs.Infra.outputs.Domain}} 
