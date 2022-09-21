@@ -35,9 +35,6 @@ Parameters:
     Type: String
     Default: photoeventdev
 Outputs:
-  BucketS3ARL:
+  Domain:
     Description: Arn de bucketS3
     Value: !GetAtt BucketS3.Arn
-  Domain:
-    Description: URL del cloudFront Distribution
-    Value: !GetAtt CloudFront.DomainName
