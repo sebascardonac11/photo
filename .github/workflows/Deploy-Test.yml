@@ -27,6 +27,7 @@ jobs:
         with:
           stack-name: 'photoevent'
           template: './Test.yml'
+          aws-region: ${{ secrets.AWS_REGION }}
           # Only apply the changeset on pushes to main/release
           parameters: 'EnvironmentName=$enviromentName'
       - name: Variable
