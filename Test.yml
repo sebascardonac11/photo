@@ -11,14 +11,67 @@ Resources:
       #  - Event: 's3:ObjectCreated:*'
       #  - Filter: 
       #  - Function: !GetAtt LambdaFunctionPhoto.Arn
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    DependsOn:
+      - BucketS3
+      - CloudFrontOriginIdentity
+    Properties:
+      Bucket: !Ref BucketName
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CloudFrontOriginIdentity}'
+            Action: 's3:GetObject'
+            Resource: 
+              - !Sub "arn:aws:s3:::${BucketName}/*"
+  CloudFrontOriginIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: 'origin identity'
+  CloudFront:
+    Type: AWS::CloudFront::Distribution
+    DependsOn:
+      - BucketS3   
+    Properties:
+      DistributionConfig:
+        Enabled: 'true'
+        Comment: Sitio web para el portal de fotos en trackday
+        Origins:
+          - DomainName: !GetAtt BucketS3.DomainName
+            OriginPath: ''
+            Id: !Ref BucketS3
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOriginIdentity}'
+        DefaultRootObject: index.html
+        DefaultCacheBehavior:
+          AllowedMethods:
+          - GET
+          - HEAD
+          Compress: true
+          TargetOriginId: !Ref BucketS3
+          ForwardedValues:
+            QueryString: 'false'
+            Cookies:
+              Forward: none
+          ViewerProtocolPolicy: redirect-to-https    
+      Tags:
+        - Key: Proyect
+          Value: PhotoEvent
 Parameters:
   EnvironmentName:
     Type: String
     Default: dev
   BucketName:
     Type: String
-    Default: photoeventdev
+    Default: photoeventqa
 Outputs:
-  Domain:
+  BucketS3ARL:
     Description: Arn de bucketS3
     Value: !GetAtt BucketS3.Arn
+  Domain:
+    Description: URL del cloudFront Distribution
+    Value: !GetAtt CloudFront.DomainName
