@@ -30,10 +30,7 @@ module.exports = class Photo {
                     "Event":event,
                     "photoID":photoID
                 },
-                Tagging:{
-                    "Session":session,
-                    "Event":event
-                }
+                Tagging:'Session='+session+'&Event='+event
             };
             var photo = await s3Client.upload(params).promise();
             this.savePhotoDB(photoID,session,event,fileName,filePath,email,photo.Location);
