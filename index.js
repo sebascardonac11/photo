@@ -16,6 +16,7 @@ exports.handler = async function (event, context, callback) {
       response = await photo.putPhoto(form.files[0].filename, contenType, body, authorizationDecoded.email, form.event, form.session);
       break;
     default:
+      console.log("### ANALYZE PHOTO ####");
       for (const i in event.Records) {
         const bucketName = event.Records[i].s3.bucket.name;
         const Key = event.Records[i].s3.object.key;

@@ -139,9 +139,9 @@ module.exports = class Photo {
                 KeyConditionExpression: 'mainkey =:hashKey',
                 FilterExpression:'entity=:entity'
             }
-            return await dynamo.put(params).promise();
+            return await dynamo.query(params).promise();
         } catch (error) {
-            console.log("Someting Wrong in savePhotoDB ", error)
+            console.log("Someting Wrong in Photo.getPersonPhoto ", error)
             return {
                 statusCode: 409,
                 data: error
