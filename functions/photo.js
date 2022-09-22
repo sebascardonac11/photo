@@ -61,12 +61,12 @@ module.exports = class Photo {
             var sessionID= metadata.Metadata.session;
             var photoID=metadata.Metadata.photoid
 
-            var persons=await this.getPersonPhoto(sessionID);
+            var personsDB=await this.getPersonPhoto(sessionID);
             var detectPhotos = new AnalyzePhoto(bucketName, Key);
             var labels = await detectPhotos.getLabel();
             var texts = await detectPhotos.getText();
             
-            var users = await detectPhotos.searchUser(labels,texts,persons.Items);
+            var personsPhoto = await detectPhotos.searchUser(labels,texts,personsDB.Items);
 
             console.log("Usuarios: ",users);
             var params = {Bucket: bucketName,Key: Key};
@@ -82,7 +82,8 @@ module.exports = class Photo {
                     }]
             }
             await s3Client.putObjectTagging(params).promise();
-            if (sessionID.length==0){
+            console.log("Personas en foto: ",personsPhoto)
+            if (personsPhoto.length==0){
                 const uuid = Str.uuid();
                 var personID = 'PERSON-' + uuid;
                 var item = {
