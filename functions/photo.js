@@ -83,7 +83,7 @@ module.exports = class Photo {
             await s3Client.putObjectTagging(params).promise();
             var item = {
                 'mainkey': metadata.Metadata.session,
-                'mainsort': metadata.Metadata.photoID,
+                'mainsort': metadata.Metadata.photoid,
                 'Tagging':{'Label':labels,'Text':texts}
             }
             console.log("a base de datos",item);
