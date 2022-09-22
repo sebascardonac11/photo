@@ -17,7 +17,7 @@ module.exports = class Photo {
     async putPhoto(fileName, contentType, body, email, event, session) {
         try {
             var filePath = "photoClient/" + event + "/" + session + "/" + fileName
-            var savePhoto = this.savePhotoDB(session,event,fileName,filePath,email);
+            var savePhoto = await this.savePhotoDB(session,event,fileName,filePath,email);
             console.log("savePhoto: ",savePhoto);
             var params = {
                 Bucket: this.BUCKET,
@@ -93,7 +93,7 @@ module.exports = class Photo {
                 TableName: this.DYNAMODBTABLE,
                 Item: item
             }
-            var result = await dynamo.put(params).promise();
+            return await dynamo.put(params).promise();
         } catch (error) {
             console.log("Someting Wrong in savePhotoDB ", error)
             return {
