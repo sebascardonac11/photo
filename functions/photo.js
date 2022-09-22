@@ -55,11 +55,7 @@ module.exports = class Photo {
                 Bucket: bucketName,
                 Key: Key
             };
-            var metadata = await s3Client.getObjectAttributes({
-                Bucket: bucketName,
-                Key: Key,
-                ObjectAttributes:["Metadata"]
-            }).promise(); 
+            var metadata = await s3Client.headObject(params).promise(); 
             console.log("Metadata: ",metadata);
             var tagging = await s3Client.getObjectTagging(params).promise();
             console.log("Tagging: ",tagging);
