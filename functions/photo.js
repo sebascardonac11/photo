@@ -19,7 +19,6 @@ module.exports = class Photo {
             const uuid = Str.uuid();
             var photoID='PHOTO#'+uuid;
             var filePath = "photoClient/" + event + "/" + session + "/" + fileName;
-            console.log("savePhoto: ",savePhoto);
             var params = {
                 Bucket: this.BUCKET,
                 Body: body,
