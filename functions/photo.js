@@ -67,8 +67,6 @@ module.exports = class Photo {
             var texts = await detectPhotos.getText();
             
             var personsPhoto = await detectPhotos.searchUser(labels,texts,personsDB.Items);
-
-            console.log("Usuarios: ",users);
             var params = {Bucket: bucketName,Key: Key};
             params.Tagging = {
                 TagSet: [
