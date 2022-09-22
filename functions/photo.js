@@ -57,21 +57,19 @@ module.exports = class Photo {
     }
     async analyzePhoto(bucketName, Key) {
         try {
-            var params = {
-                Bucket: bucketName,
-                Key: Key
-            };
-            var metadata = await s3Client.headObject(params).promise();
+            var metadata = await s3Client.headObject({ Bucket: bucketName,Key: Key}).promise();
             var sessionID= metadata.Metadata.session;
             var photoID=metadata.Metadata.photoid
+
             var persons=await this.getPersonPhoto(sessionID);
-            console.log(persons);
             var detectPhotos = new AnalyzePhoto(bucketName, Key);
             var labels = await detectPhotos.getLabel();
             var texts = await detectPhotos.getText();
             
-            var users = detectPhotos.searchUser(labels,texts,persons.Items);
+            var users = await detectPhotos.searchUser(labels,texts,persons.Items);
+
             console.log("Usuarios: ",users);
+            var params = {Bucket: bucketName,Key: Key};
             params.Tagging = {
                 TagSet: [
                     {
@@ -93,6 +91,8 @@ module.exports = class Photo {
                     'entity':'PERSON',
                     'photo':photoID
                 }
+
+                console.log("Guardando persona",item)
                 this.saveDB(item);
             }
            /* var item = {
