@@ -1,6 +1,7 @@
 const AWS = require('aws-sdk');
 const s3Client = new AWS.S3();
 //AWS.config.update({ region: 'us-east-2' });
+const Str = require('@supercharge/strings')
 const dynamo = new AWS.DynamoDB.DocumentClient();
 
 const AnalyzePhoto = require('./analyzePhoto')
@@ -16,6 +17,7 @@ module.exports = class Photo {
     async putPhoto(fileName, contentType, body, email, event, session) {
         try {
             var filePath = "photoClient/" + event + "/" + session + "/" + fileName
+            this.savePhotoDB(session,event,fileName,filePath,email);
             var params = {
                 Bucket: this.BUCKET,
                 Body: body,
@@ -61,9 +63,9 @@ module.exports = class Photo {
                 Bucket: bucketName,
                 Key: Key
             };
-            var tagging =await s3Client.getObjectTagging(params).promise();
-            if(tagging.TagSet.length == 0 ){
-                params.Tagging={
+            var tagging = await s3Client.getObjectTagging(params).promise();
+            if (tagging.TagSet.length == 0) {
+                params.Tagging = {
                     TagSet: [
                         {
                             Key: "Labels",
@@ -78,7 +80,7 @@ module.exports = class Photo {
             }
             return {
                 statusCode: 200,
-                data: '{label:{'+labels+'},text:{'+texts+'} }'
+                data: '{label:{' + labels + '},text:{' + texts + '} }'
             }
         } catch (error) {
             console.log("Something wrong in photo.analyzePhoto: ", error)
@@ -86,6 +88,32 @@ module.exports = class Photo {
                 statusCode: 404,
                 data: error
             }
+        }
+    }
+    async savePhotoDB(session,event,fileName,filePath,email) {
+        try {
+            const uuid = Str.uuid();
+            item ={
+                'mainkey':session,
+                'mainSsort':'PHOTO#'+uuid,
+                'entity':'PHOTO',
+                'photographer':email,
+                'event':event,
+                'name':fileName,
+                'filePath':filePath
+            }
+            var params = {
+                TableName: this.DYNAMODBTABLE,
+                Item: item
+            }
+            var result = await dynamo.put(params).promise();
+            console.log("result: ", result)
+        } catch (error) {
+            console.log("Someting Wrong creating sessions", error)
+            return {
+                statusCode: 409,
+                data: result
+            };
         }
     }
 }
