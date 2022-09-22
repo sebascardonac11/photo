@@ -42,7 +42,7 @@ module.exports = class Photo {
                 'filePath': filePath,
                 'location': photo.Location
             }
-            this.saveDB(item);
+           var db= this.saveDB(item);
             return {
                 statusCode: 200,
                 data: photo
@@ -57,6 +57,10 @@ module.exports = class Photo {
     }
     async analyzePhoto(bucketName, Key) {
         try {
+            var params = {
+                Bucket: bucketName,
+                Key: Key
+            };
             var metadata = await s3Client.headObject(params).promise();
             var sessionID= metadata.Metadata.session;
             var photoID=metadata.Metadata.photoid
@@ -68,10 +72,6 @@ module.exports = class Photo {
             
             var users = detectPhotos.searchUser(labels,texts,persons.Items);
             console.log("Usuarios: ",users);
-            var params = {
-                Bucket: bucketName,
-                Key: Key
-            };
             params.Tagging = {
                 TagSet: [
                     {
@@ -121,7 +121,7 @@ module.exports = class Photo {
             }
             return await dynamo.put(params).promise();
         } catch (error) {
-            console.log("Someting Wrong in savePhotoDB ", error)
+            console.log("Someting Wrong in Photo.savePhotoDB ", error)
             return {
                 statusCode: 409,
                 data: result
