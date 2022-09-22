@@ -17,7 +17,7 @@ module.exports = class Photo {
     async putPhoto(fileName, contentType, body, email, event, session) {
         try {
             const uuid = Str.uuid();
-            var photoID='PHOTO#'+uuid;
+            var photoID='PHOTO-'+uuid;
             var filePath = "photoClient/" + event + "/" + session + "/" + fileName;
             var params = {
                 Bucket: this.BUCKET,
@@ -55,9 +55,7 @@ module.exports = class Photo {
                 Bucket: bucketName,
                 Key: Key
             };
-            console.log("Label ",labels);
             var tagging = await s3Client.getObjectTagging(params).promise();
-            console.log("Tagging ",tagging);
             if (tagging.TagSet.length == 0) {
                 params.Tagging = {
                     TagSet: [
