@@ -15,6 +15,7 @@ function analyzePhoto(bucket, photo) {
         MaxLabels: 10
       }
       var labelsTags = "";
+      console.log(params);
       const data = await client.detectLabels(params, function (err, data) { if (err) console.log(err, err.stack); }).promise();
       data.Labels.forEach(label => {
         if (labelsTags.search(label.Name) == -1)
