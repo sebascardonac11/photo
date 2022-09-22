@@ -20,7 +20,8 @@ function analyzePhoto(bucket, photo) {
         if (labelsTags.search(label.Name) == -1)
           labelsTags += label.Name + "-";
       });
-      return labelsTags;
+
+      return {'labelsTags':labelsTags,arrayTags:data.Labels};
     } catch (error) {
       console.log("Something wrong in analyzePhoto.getLabel: ", error)
     }
@@ -40,7 +41,14 @@ function analyzePhoto(bucket, photo) {
       if (texts.search(text.DetectedText) == -1)
         texts += text.DetectedText + "-";
     });
-    return texts;
+    return {'texts':texts,'arrayTags':data.TextDetections};
   };
+  this.searchUser = async function(label,text,persons){
+    var personsID=[]
+    for (const i in persons) {
+      personsID.push(persons[i]);
+    }
+    return personsID;
+  }
 }
 module.exports = analyzePhoto

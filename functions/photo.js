@@ -42,7 +42,7 @@ module.exports = class Photo {
                 'filePath': filePath,
                 'location': photo.Location
             }
-            this.savePhotoDB(item);
+            this.saveDB(item);
             return {
                 statusCode: 200,
                 data: photo
@@ -57,38 +57,50 @@ module.exports = class Photo {
     }
     async analyzePhoto(bucketName, Key) {
         try {
+            var metadata = await s3Client.headObject(params).promise();
+            var sessionID= metadata.Metadata.session;
+            var photoID=metadata.Metadata.photoid
+            var persons=this.getPersonPhoto(sessionID);
+            console.log(persons);
             var detectPhotos = new AnalyzePhoto(bucketName, Key);
             var labels = await detectPhotos.getLabel();
             var texts = await detectPhotos.getText();
+            
+            var users = detectPhotos.searchUser(labels,texts,persons.Items);
+            console.log("Usuarios: ",users);
             var params = {
                 Bucket: bucketName,
                 Key: Key
             };
-            var metadata = await s3Client.headObject(params).promise();
-            console.log("Metadata: ", metadata.Metadata);
-            var tagging = await s3Client.getObjectTagging(params).promise();
-            console.log("Tagging: ", tagging);
-
             params.Tagging = {
                 TagSet: [
                     {
                         Key: "Labels",
-                        Value: labels
+                        Value: labels.labelsTags
                     },
                     {
                         Key: "Texts",
-                        Value: texts
+                        Value: texts.texts
                     }]
             }
             await s3Client.putObjectTagging(params).promise();
-            var item = {
+            if (sessionID.length==0){
+                const uuid = Str.uuid();
+                var personID = 'PERSON-' + uuid;
+                var item = {
+                    'mainkey': sessionID,
+                    'mainsort': personID,
+                    'entity':'PERSON',
+                    'photo':photoID
+                }
+                this.saveDB(item);
+            }
+           /* var item = {
                 'mainkey': metadata.Metadata.session,
                 'mainsort': metadata.Metadata.photoid,
-                'Tagging':{'Label':labels,'Text':texts}
+                'Tagging':{'Label':labels.labelsTags,'Text':texts.texts}
             }
-            console.log("a base de datos",item);
-            var database = await this.savePhotoDB(item);
-            console.log("Database= ",database);
+            this.savePhotoDB(item);*/
             return {
                 statusCode: 200,
                 data: '{label:{' + labels + '},text:{' + texts + '} }'
@@ -101,11 +113,31 @@ module.exports = class Photo {
             }
         }
     }
-    async savePhotoDB(item) {
+    async saveDB(item) {
         try {
             var params = {
                 TableName: this.DYNAMODBTABLE,
                 Item: item
+            }
+            return await dynamo.put(params).promise();
+        } catch (error) {
+            console.log("Someting Wrong in savePhotoDB ", error)
+            return {
+                statusCode: 409,
+                data: result
+            };
+        }
+    }
+    async getPersonPhoto(sessionID){
+        try {
+            var params = {
+                TableName: this.DYNAMODBTABLE,
+                ExpressionAttributeValues: {
+                    ':hashKey': sessionID,
+                    ':entity':'PERSON'
+                },
+                KeyConditionExpression: 'mainkey =:hashKey',
+                FilterExpression:'entity=:entity'
             }
             return await dynamo.put(params).promise();
         } catch (error) {
