@@ -86,7 +86,7 @@ module.exports = class Photo {
                 'mainsort': metadata.Metadata.photoID,
                 'Tagging':{'Label':labels,'Text':texts}
             }
-            var database = this.savePhotoDB(item);
+            var database = await this.savePhotoDB(item);
             console.log("Database= ",database);
             return {
                 statusCode: 200,
