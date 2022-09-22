@@ -17,7 +17,8 @@ module.exports = class Photo {
     async putPhoto(fileName, contentType, body, email, event, session) {
         try {
             var filePath = "photoClient/" + event + "/" + session + "/" + fileName
-            this.savePhotoDB(session,event,fileName,filePath,email);
+            var savePhoto = this.savePhotoDB(session,event,fileName,filePath,email);
+            console.log("savePhoto: ",savePhoto);
             var params = {
                 Bucket: this.BUCKET,
                 Body: body,
@@ -27,9 +28,6 @@ module.exports = class Photo {
                     "Photographer": email
                 }
             };
-            var item = { 'photographer': email, 'session': session, 'key': fileName }
-            var photoDB = await this.insertPhotoDB(item);
-            console.log('DB: ', photoDB);
             var photo = await s3Client.upload(params).promise();
             return {
                 statusCode: 200,
@@ -41,17 +39,6 @@ module.exports = class Photo {
                 statusCode: 404,
                 data: error
             }
-        }
-    }
-    async insertPhotoDB(Item) {
-        try {
-            var params = {
-                TableName: this.DYNAMODBTABLE,
-                Item: Item
-            }
-            return await dynamo.put(params).promise();
-        } catch (error) {
-            console.log("Something wrong in photo.insertPhotoDB: ", error);
         }
     }
     async analyzePhoto(bucketName, Key) {
@@ -106,9 +93,7 @@ module.exports = class Photo {
                 TableName: this.DYNAMODBTABLE,
                 Item: item
             }
-            console.log("params: ", params)
             var result = await dynamo.put(params).promise();
-            console.log("result: ", result)
         } catch (error) {
             console.log("Someting Wrong in savePhotoDB ", error)
             return {
