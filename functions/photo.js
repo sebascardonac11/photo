@@ -54,7 +54,9 @@ module.exports = class Photo {
                 Bucket: bucketName,
                 Key: Key
             };
+            console.log("Label ",labels);
             var tagging = await s3Client.getObjectTagging(params).promise();
+            console.log("Tagging ",tagging);
             if (tagging.TagSet.length == 0) {
                 params.Tagging = {
                     TagSet: [
