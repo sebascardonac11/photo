@@ -144,7 +144,7 @@ module.exports = class Photo {
             console.log("Someting Wrong in savePhotoDB ", error)
             return {
                 statusCode: 409,
-                data: result
+                data: error
             };
         }
     }
