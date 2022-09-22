@@ -95,7 +95,7 @@ module.exports = class Photo {
             const uuid = Str.uuid();
             var item ={
                 'mainkey':session,
-                'mainSsort':'PHOTO#'+uuid,
+                'mainsort':'PHOTO#'+uuid,
                 'entity':'PHOTO',
                 'photographer':email,
                 'event':event,
