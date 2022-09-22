@@ -16,6 +16,8 @@ module.exports = class Photo {
 
     async putPhoto(fileName, contentType, body, email, event, session) {
         try {
+            const uuid = Str.uuid();
+            var photoID='PHOTO#'+uuid;
             var filePath = "photoClient/" + event + "/" + session + "/" + fileName;
             console.log("savePhoto: ",savePhoto);
             var params = {
@@ -26,11 +28,12 @@ module.exports = class Photo {
                 Metadata: {
                     "Photographer": email,
                     "Session":session,
-                    "Event":event
+                    "Event":event,
+                    "photoID":photoID
                 }
             };
             var photo = await s3Client.upload(params).promise();
-            this.savePhotoDB(session,event,fileName,filePath,email,photo.Location);
+            this.savePhotoDB(photoID,session,event,fileName,filePath,email,photo.Location);
             return {
                 statusCode: 200,
                 data: photo
@@ -79,12 +82,11 @@ module.exports = class Photo {
             }
         }
     }
-    async savePhotoDB(session,event,fileName,filePath,email,location) {
+    async savePhotoDB(photoID,session,event,fileName,filePath,email,location) {
         try {
-            const uuid = Str.uuid();
             var item ={
                 'mainkey':session,
-                'mainsort':'PHOTO#'+uuid,
+                'mainsort':photoID,
                 'entity':'PHOTO',
                 'photographer':email,
                 'event':event,
