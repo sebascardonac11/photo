@@ -106,6 +106,7 @@ module.exports = class Photo {
                 TableName: this.DYNAMODBTABLE,
                 Item: item
             }
+            console.log("params: ", params)
             var result = await dynamo.put(params).promise();
             console.log("result: ", result)
         } catch (error) {
