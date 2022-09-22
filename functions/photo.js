@@ -48,7 +48,6 @@ module.exports = class Photo {
     }
     async analyzePhoto(bucketName, Key) {
         try {
-            console.log("Entro a  Photo.analyzePhoto",Key);
             var detectPhotos = new AnalyzePhoto(bucketName, Key);
             var labels = await detectPhotos.getLabel();
             var texts = await detectPhotos.getText();
@@ -56,7 +55,11 @@ module.exports = class Photo {
                 Bucket: bucketName,
                 Key: Key
             };
-            var metadata = await s3Client.getObjectAttributes(params).promise(); 
+            var metadata = await s3Client.getObjectAttributes({
+                Bucket: bucketName,
+                Key: Key,
+                ObjectAttributes:["Metadata"]
+            }).promise(); 
             console.log("Metadata: ",metadata);
             var tagging = await s3Client.getObjectTagging(params).promise();
             console.log("Tagging: ",tagging);
