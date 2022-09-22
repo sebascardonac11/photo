@@ -3,6 +3,7 @@ on:
   push:
     branches:
     - feature/analyse
+    - feature/putPhoto
 env:
   enviromentName: dev
 jobs:
