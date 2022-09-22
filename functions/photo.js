@@ -16,8 +16,7 @@ module.exports = class Photo {
 
     async putPhoto(fileName, contentType, body, email, event, session) {
         try {
-            var filePath = "photoClient/" + event + "/" + session + "/" + fileName
-            var savePhoto = await this.savePhotoDB(session,event,fileName,filePath,email);
+            var filePath = "photoClient/" + event + "/" + session + "/" + fileName;
             console.log("savePhoto: ",savePhoto);
             var params = {
                 Bucket: this.BUCKET,
@@ -25,10 +24,13 @@ module.exports = class Photo {
                 Key: filePath,
                 ContentType: contentType,
                 Metadata: {
-                    "Photographer": email
+                    "Photographer": email,
+                    "Session":session,
+                    "Event":event
                 }
             };
             var photo = await s3Client.upload(params).promise();
+            this.savePhotoDB(session,event,fileName,filePath,email,photo.Location);
             return {
                 statusCode: 200,
                 data: photo
@@ -77,7 +79,7 @@ module.exports = class Photo {
             }
         }
     }
-    async savePhotoDB(session,event,fileName,filePath,email) {
+    async savePhotoDB(session,event,fileName,filePath,email,location) {
         try {
             const uuid = Str.uuid();
             var item ={
@@ -87,7 +89,8 @@ module.exports = class Photo {
                 'photographer':email,
                 'event':event,
                 'name':fileName,
-                'filePath':filePath
+                'filePath':filePath,
+                'location':location
             }
             var params = {
                 TableName: this.DYNAMODBTABLE,
