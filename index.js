@@ -10,7 +10,6 @@ exports.handler = async function (event, context, callback) {
       console.log("### PUT ####");
       var authorizationDecoded = jwt_decode(event.headers.Authorization);
       const form = await parser.parse(event);
-      console,log("Form: ", form)
       var key = form.event + '/' + form.session + '/' + form.files[0].filename;
       var contenType = form.files[0].contentType;
       var body = Buffer.from(form.files[0].content);
