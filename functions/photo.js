@@ -93,7 +93,7 @@ module.exports = class Photo {
     async savePhotoDB(session,event,fileName,filePath,email) {
         try {
             const uuid = Str.uuid();
-            item ={
+            var item ={
                 'mainkey':session,
                 'mainSsort':'PHOTO#'+uuid,
                 'entity':'PHOTO',
@@ -109,7 +109,7 @@ module.exports = class Photo {
             var result = await dynamo.put(params).promise();
             console.log("result: ", result)
         } catch (error) {
-            console.log("Someting Wrong creating sessions", error)
+            console.log("Someting Wrong in savePhotoDB ", error)
             return {
                 statusCode: 409,
                 data: result
