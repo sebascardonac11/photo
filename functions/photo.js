@@ -64,7 +64,7 @@ module.exports = class Photo {
             var metadata = await s3Client.headObject(params).promise();
             var sessionID= metadata.Metadata.session;
             var photoID=metadata.Metadata.photoid
-            var persons=this.getPersonPhoto(sessionID);
+            var persons=await this.getPersonPhoto(sessionID);
             console.log(persons);
             var detectPhotos = new AnalyzePhoto(bucketName, Key);
             var labels = await detectPhotos.getLabel();
