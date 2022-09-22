@@ -29,6 +29,10 @@ module.exports = class Photo {
                     "Session":session,
                     "Event":event,
                     "photoID":photoID
+                },
+                Tagging:{
+                    "Session":session,
+                    "Event":event
                 }
             };
             var photo = await s3Client.upload(params).promise();
@@ -55,7 +59,10 @@ module.exports = class Photo {
                 Bucket: bucketName,
                 Key: Key
             };
+            var metadata = await s3Client.getObjectAttributes(params).promise(); 
+            console.log("Metadata: ",metadata);
             var tagging = await s3Client.getObjectTagging(params).promise();
+            console.log("Tagging: ",tagging);
             if (tagging.TagSet.length == 0) {
                 params.Tagging = {
                     TagSet: [
