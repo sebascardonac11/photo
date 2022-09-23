@@ -65,6 +65,7 @@ module.exports = class Photo {
             var photoID = metadata.Metadata.photoid
             //Get persons of sessions
             var personsDB = await this.getPersonPhoto(sessionID);
+            console.log("Personas en DB",personsDB);
             // Analyze Photo.
             var detectPhotos = new AnalyzePhoto(bucketName, Key);
             var labels = await detectPhotos.getLabel();
@@ -74,7 +75,7 @@ module.exports = class Photo {
                 var item = {
                     'mainkey': sessionID,
                     'mainsort': personID,
-                    'entity': 'PERSON',
+                    'entity': 'PERSON-',
                     'photo': photoID,
                     'texts': texts.arrayTexts,
                     'labels': labels.arrayTags
