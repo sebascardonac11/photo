@@ -38,5 +38,6 @@ var event = {
     ]
 }
 
-
-index.handler(event,{},{});
+var SessionID='SESSION-8295f7d0-40a1-4a3f-92a6-758d9a3322de'
+console.log(SessionID.split('SESSION-'));
+//index.handler(event,{},{});

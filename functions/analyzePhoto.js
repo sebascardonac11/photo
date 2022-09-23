@@ -41,12 +41,19 @@ function analyzePhoto(bucket, photo) {
       if (texts.search(text.DetectedText) == -1)
         texts += text.DetectedText + "-";
     });
-    return {'texts':texts,'arrayTags':data.TextDetections};
+    return {'texts':texts,'arrayTexts':data.TextDetections};
   };
   this.searchUser = async function(label,text,persons){
     var personsID=[]
+    var isPerson;
     for (const i in persons) {
-      personsID.push(persons[i]);
+      for (const j in persons[i].texts){
+        var pos =text.indexOf(persons[i].texts[j])
+          if (pos != -1){
+            personsID.push(persons[i])
+            console.log('Encontre texto el texto: ',text[pos]);
+          }
+      }
     }
     return personsID;
   }

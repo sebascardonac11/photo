@@ -42,7 +42,7 @@ module.exports = class Photo {
                 'filePath': filePath,
                 'location': photo.Location
             }
-           var db= this.saveDB(item);
+            var db = this.saveDB(item);
             return {
                 statusCode: 200,
                 data: photo
@@ -57,17 +57,65 @@ module.exports = class Photo {
     }
     async analyzePhoto(bucketName, Key) {
         try {
-            var metadata = await s3Client.headObject({ Bucket: bucketName,Key: Key}).promise();
-            var sessionID= metadata.Metadata.session;
-            var photoID=metadata.Metadata.photoid
-
-            var personsDB=await this.getPersonPhoto(sessionID);
+            const uuid = Str.uuid();
+            var personID = 'PERSON-' + uuid;
+            // Identify photo
+            var metadata = await s3Client.headObject({ Bucket: bucketName, Key: Key }).promise();
+            var sessionID = metadata.Metadata.session;
+            var photoID = metadata.Metadata.photoid
+            //Get persons of sessions
+            var personsDB = await this.getPersonPhoto(sessionID);
+            // Analyze Photo.
             var detectPhotos = new AnalyzePhoto(bucketName, Key);
             var labels = await detectPhotos.getLabel();
             var texts = await detectPhotos.getText();
-            
-            var personsPhoto = await detectPhotos.searchUser(labels,texts,personsDB.Items);
-            var params = {Bucket: bucketName,Key: Key};
+
+            if (personsDB.length == 0) {
+                var item = {
+                    'mainkey': sessionID,
+                    'mainsort': personID,
+                    'entity': 'PERSON',
+                    'photo': photoID,
+                    'texts': texts.arrayTexts,
+                    'labels': labels.arrayTags
+                }
+                this.saveDB(item);
+                console.log("Tags: ", params.Tagging.TagSet[0]);
+            } else {
+                //  
+                var personsPhoto = await detectPhotos.searchUser(labels, texts, personsDB.Items);
+                console.log("Personas en foto: ", personsPhoto)
+                if (personsPhoto.length == 0) {
+                    //Put photo in unclassified category
+                    var item = {
+                        'mainkey': sessionID,
+                        'mainsort': 'PERSON' + sessionID.split('SESSION-')[1],
+                        'entity': 'PERSON',
+                        'photo': photoID,
+                        'texts': texts.arrayTexts,
+                        'labels': labels.arrayTags
+                    }
+
+                    console.log("Guardar foto sin clasificar: ", item)
+                    //this.saveDB(item);
+                } else {
+                    //Put photo whith person
+                    for (const key in personsPhoto) {
+                        var item = {
+                            'mainkey': sessionID,
+                            'mainsort': personsPhoto[key].mainsort,
+                            'entity': 'PERSON',
+                            'photo': photoID,
+                            'texts': texts.arrayTexts,
+                            'labels': labels.arrayTags
+                        }
+                        console.log("Guardar foto de persona: ", personsPhoto)
+                       // this.saveDB(item);
+
+                    }
+                }
+            }
+            var params = { Bucket: bucketName, Key: Key };
             params.Tagging = {
                 TagSet: [
                     {
@@ -77,29 +125,15 @@ module.exports = class Photo {
                     {
                         Key: "Texts",
                         Value: texts.texts
-                    }]
+                    },]
             }
             await s3Client.putObjectTagging(params).promise();
-            console.log("Personas en foto: ",personsPhoto)
-            if (personsPhoto.length==0){
-                const uuid = Str.uuid();
-                var personID = 'PERSON-' + uuid;
-                var item = {
-                    'mainkey': sessionID,
-                    'mainsort': personID,
-                    'entity':'PERSON',
-                    'photo':photoID
-                }
-
-                console.log("Guardando persona",item)
-                this.saveDB(item);
-            }
-           /* var item = {
-                'mainkey': metadata.Metadata.session,
-                'mainsort': metadata.Metadata.photoid,
-                'Tagging':{'Label':labels.labelsTags,'Text':texts.texts}
-            }
-            this.savePhotoDB(item);*/
+            /* var item = {
+                 'mainkey': metadata.Metadata.session,
+                 'mainsort': metadata.Metadata.photoid,
+                 'Tagging':{'Label':labels.labelsTags,'Text':texts.texts}
+             }
+             this.savePhotoDB(item);*/
             return {
                 statusCode: 200,
                 data: '{label:{' + labels + '},text:{' + texts + '} }'
@@ -127,16 +161,16 @@ module.exports = class Photo {
             };
         }
     }
-    async getPersonPhoto(sessionID){
+    async getPersonPhoto(sessionID) {
         try {
             var params = {
                 TableName: this.DYNAMODBTABLE,
                 ExpressionAttributeValues: {
                     ':hashKey': sessionID,
-                    ':entity':'PERSON'
+                    ':entity': 'PERSON'
                 },
                 KeyConditionExpression: 'mainkey =:hashKey',
-                FilterExpression:'entity=:entity'
+                FilterExpression: 'entity=:entity'
             }
             return await dynamo.query(params).promise();
         } catch (error) {
