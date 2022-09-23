@@ -75,7 +75,7 @@ module.exports = class Photo {
                 var item = {
                     'mainkey': sessionID,
                     'mainsort': personID,
-                    'entity': 'PERSON-',
+                    'entity': 'PERSON',
                     'photo': photoID,
                     'texts': texts.arrayTexts,
                     'labels': labels.arrayTags
@@ -90,15 +90,13 @@ module.exports = class Photo {
                     //Put photo in unclassified category
                     var item = {
                         'mainkey': sessionID,
-                        'mainsort': 'PERSON' + sessionID.split('SESSION-')[1],
+                        'mainsort': 'PERSON-' + sessionID.split('SESSION-')[1],
                         'entity': 'PERSON',
                         'photo': photoID,
-                        'texts': texts.arrayTexts,
-                        'labels': labels.arrayTags
                     }
 
                     console.log("Guardar foto sin clasificar: ", item)
-                    //this.saveDB(item);
+                    this.saveDB(item);
                 } else {
                     //Put photo whith person
                     for (const key in personsPhoto) {
