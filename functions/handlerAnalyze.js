@@ -25,7 +25,6 @@ module.exports = class handlerAnalyze {
             var labels = await this.findRekognitionLabels(key);
             var photo = new Photo(this.bucket, this.table);
             await photo.loadMeta(key, texts, labels);
-            photo.putTagging(texts.texts,labels.labelsTags);
             //Get persons of sessions
             var personsDB = await this.getPersons(photo.SessionID, photo)
             

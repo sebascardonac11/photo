@@ -75,7 +75,7 @@ module.exports = class Photo {
         }
     }
     async putTagging(Texts, Labes) {
-        var params = { Bucket: this.BUCKET, Key: Key };
+        var params = { Bucket: this.BUCKET, Key: this.Key };
         params.Tagging = {
             TagSet: [
                 {
@@ -95,8 +95,19 @@ module.exports = class Photo {
             this.SessionID = metadata.Metadata.session;
             this.PhotoID = metadata.Metadata.photoid;
             this.Key = key;
-            this.Texts.push(this.Texts);
+            this.Texts.push(texts);
             this.Lables.push(labels);
+            s3Client.putObjectTagging({ Bucket: this.BUCKET, Key: key, 
+                TagSet:[
+                    {
+                        Key: "Labels",
+                        Value: labels
+                    },
+                    {
+                        Key: "Texts",
+                        Value: texts
+                    },]
+            }).promise();
         } catch (error) {
             console.log("Something wrong in photo.loadMeta: ", error)
         }
