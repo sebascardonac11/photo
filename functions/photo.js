@@ -75,7 +75,7 @@ module.exports = class Photo {
         }
     }
     async putTagging(Texts, Labes) {
-        var params = { Bucket: bucketName, Key: Key };
+        var params = { Bucket: this.BUCKET, Key: Key };
         params.Tagging = {
             TagSet: [
                 {
