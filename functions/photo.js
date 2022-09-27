@@ -2,7 +2,7 @@ const AWS = require('aws-sdk');
 //AWS.config.update({ region: 'us-east-2' });
 
 const s3Client = new AWS.S3();
-const Rekognition = new AWS.Rekognition();
+const Str = require('@supercharge/strings');
 
 const dynamo = new AWS.DynamoDB.DocumentClient();
 module.exports = class Photo {
