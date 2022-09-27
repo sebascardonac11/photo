@@ -3,9 +3,9 @@ const jwt_decode = require('jwt-decode');
 const parser = require('lambda-multipart-parser');
 const handlerAnalyze = require('./functions/handlerAnalyze');
 exports.handler = async function (event, context, callback) {
-  //console.log("Event Photo: ", JSON.stringify(event));
-  //var photo = new Photo(process.env.BUCKET, process.env.DYNAMODB);
-  var photo = new Photo('photoeventdev', 'photoEvent');
+  console.log("Event Photo: ", JSON.stringify(event));
+  var photo = new Photo(process.env.BUCKET, process.env.DYNAMODB);
+  //var photo = new Photo('photoeventdev', 'photoEvent');
   var response = { statusCode: 401, data: "Whitout Information" };
   switch (event.httpMethod) {
     case 'PUT':
@@ -19,8 +19,8 @@ exports.handler = async function (event, context, callback) {
       break;
     default:
       console.log("### ANALYZE PHOTO ####");
-      var analyzePhoto=new handlerAnalyze(event,'photoeventdev','photoEvent');
-
+      //var analyzePhoto=new handlerAnalyze(event,'photoeventdev','photoEvent');
+      var analyzePhoto=new handlerAnalyze(event,process.env.BUCKET, process.env.DYNAMODB);
       for (const i in event.Records) {
         const Key = event.Records[i].s3.object.key;
         response = await analyzePhoto.analyse(Key);
