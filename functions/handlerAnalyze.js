@@ -35,6 +35,7 @@ module.exports = class handlerAnalyze {
                 if (personsDB[i].analyzeText(texts.texts)) {
                     personsDB[i].addPhoto(photo.PhotoID);
                     personsDB[i].saveDB();
+                    console.log("Photo add in person: ",personsDB[i].mainsort);
                 }
             }
             if (i == 0) {
@@ -44,6 +45,7 @@ module.exports = class handlerAnalyze {
                         //Put photo in unclassified category
                         this.unClassified.addPhoto(photo.PhotoID, texts.texts, labels.labelsTags, texts.arrayNumbers);
                         this.unClassified.saveDB();
+                        console.log("Photo add in unclassified category",this.unClassified.photos);
                     }else{
                         var person = new Person(photo.SessionID,personID,texts.texts,labels.labelsTags,text.arrayNumbers,this.table);
                         person.addPhoto(photo.PhotoID);
@@ -52,10 +54,12 @@ module.exports = class handlerAnalyze {
                         person.saveDB();
                         this.unClassified.deletePhoto(ind);
                         this.unClassified.saveDB();
+                        console.log("Photo add in new person", personID);
                     }
                 } else {
                     //Put photo in unclassified category
                     this.saveUnClassified(photo, texts, labels);
+                    console.log("Photo add in unclassified category");
                 }
             }
         } catch (error) {
