@@ -47,6 +47,11 @@ module.exports = class Unclassified {
                 pos= i;
             }
         }
+        for (const i in this.numbers) {
+            if (Texts.numbers.search(this.texts[i])=! -1) {
+                pos= i;
+            }
+        }
         return pos;
     }
     async saveDB() {

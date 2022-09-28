@@ -132,6 +132,7 @@ module.exports = class handlerAnalyze {
             const data = await Rekognition.detectText(paramsText).promise();
             var texts = ""
             var arrayTexts = []
+            var numbers=""
             var arrayNumbers = []
             data.TextDetections.forEach(text => {
                 const onlyLetters = text.DetectedText.replace(/[0-9]+/g, ""); // esto retorna 'abcd'
@@ -144,10 +145,11 @@ module.exports = class handlerAnalyze {
                 }
                 if (texts.search(onlyNumbers) == -1 && onlyNumbers != '') {
                     texts += onlyNumbers + "-";
+                    numbers +=onlyNumbers + "-";
                     arrayNumbers.push(onlyNumbers);
                 }
             });
-            return { 'texts': texts, 'arrayTexts': arrayTexts, 'arrayNumbers': arrayNumbers };
+            return { 'texts': texts, 'arrayTexts': arrayTexts, 'arrayNumbers': arrayNumbers,'numbers':numbers };
         } catch (error) {
             console.log("Something wrong in handlerAnalyze.findRekognitionText: ", error)
         }
