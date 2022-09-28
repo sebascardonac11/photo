@@ -13,7 +13,7 @@ var event = {
                     "arn": "arn:aws:s3:::photoeventdev"
                 },
                 "object": {
-                    "key": "photoClient/EVENT-12bf90bf-95a6-4692-bc04-4b19a5b0aa65/SESSION-8295f7d0-40a1-4a3f-92a6-758d9a3322de/SCC_0044.jpg",
+                    "key": "photoClient/EVENT-12bf90bf-95a6-4692-bc04-4b19a5b0aa65/SESSION-8295f7d0-40a1-4a3f-92a6-758d9a3322de/SCC_0043.jpg",
                     "size": 1350382,
                     "eTag": "8352b2810016fe2ca0f1355720a73897",
                     "sequencer": "00632DC113F71CEEA8"

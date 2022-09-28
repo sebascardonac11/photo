@@ -11,27 +11,27 @@ module.exports = class Unclassified {
     photos = [];
     labels = [];
     texts = [];
-    numbers=[];
-    constructor(sessionID,personID,texts,labels,photos,numbers,table) {
+    numbers = [];
+    constructor(sessionID, personID, texts, labels, photos, numbers, table) {
         this.DYNAMODBTABLE = table
-        this.mainkey=sessionID;
-        this.mainsort=personID;
-        this.texts=texts;
-        this.labels=labels;
-        this.numbers=numbers;
-        this.photos=photos;
+        this.mainkey = sessionID;
+        this.mainsort = personID;
+        this.texts = texts;
+        this.labels = labels;
+        this.numbers = numbers;
+        this.photos = photos;
     }
-    async load(sessionID,unclassifiedID,texts,labels,photos,numbers,table) {
+    async load(sessionID, unclassifiedID, texts, labels, photos, numbers, table) {
         this.DYNAMODBTABLE = table
-        this.mainkey=sessionID;
-        this.mainsort=unclassifiedID;
-        this.texts=[]
+        this.mainkey = sessionID;
+        this.mainsort = unclassifiedID;
+        this.texts = []
         this.texts.push(texts);
-        this.labels=[]
+        this.labels = []
         this.labels.push(labels);
-        this.photos=[]
+        this.photos = []
         this.photos.push(photos);
-        this.numbers=[]
+        this.numbers = []
         this.numbers.push(numbers);
     }
 
@@ -40,16 +40,20 @@ module.exports = class Unclassified {
      */
     async analyzeText(Texts) {
         var pos = -1;
-        var text ="";
+        var text = "";
         for (const i in this.texts) {
-            text=this.texts[i];
+            text = this.texts[i];
             if (text.search(Texts.texts) != -1) {
-                pos= i;
+                pos = i;
             }
         }
         for (const i in this.numbers) {
-            if (Texts.numbers.search(this.texts[i])=! -1) {
-                pos= i;
+            for (const j in this.numbers[i]) {
+                var num =this.numbers[i][j]+'';
+                var numTexts=Texts.numbers+''
+                if (numTexts.search(num) != -1) {
+                    pos = i;
+                }
             }
         }
         return pos;
@@ -58,14 +62,14 @@ module.exports = class Unclassified {
         try {
             var params = {
                 TableName: this.DYNAMODBTABLE,
-                Item:{
+                Item: {
                     'mainkey': this.mainkey,
                     'mainsort': this.mainsort,
                     'entity': this.entity,
                     'photo': this.photos,
                     'texts': this.texts,
                     'labels': this.labels,
-                    'numbers':this.numbers
+                    'numbers': this.numbers
                 }
             }
             return await dynamo.put(params).promise();
@@ -77,25 +81,25 @@ module.exports = class Unclassified {
             };
         }
     }
-    async addPhoto(photo,text,label,number){
+    async addPhoto(photo, text, label, number) {
         this.photos.push(photo);
         this.texts.push(text);
         this.labels.push(label);
         this.numbers.push(number);
     }
-    async getPhoto(index){
+    async getPhoto(index) {
         return this.photos[index];
     }
-    async deletePhoto(index){
+    async deletePhoto(index) {
         this.photos.splice(index, 1);
         this.labels.splice(index, 1);
         this.texts.splice(index, 1);
         this.numbers.splice(index, 1);
     }
-    async addTexts(Texts){
-        if(this.isUnClassified){
+    async addTexts(Texts) {
+        if (this.isUnClassified) {
             this.texts.push(Texts);
-        }else{
+        } else {
             console.log("Falta desarrollar person.addTexts")
         }
     }

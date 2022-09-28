@@ -47,7 +47,7 @@ module.exports = class handlerAnalyze {
                         await this.unClassified.saveDB();
                         console.log("Photo add in unclassified category",this.unClassified.photos);
                     }else{
-                        var person = new Person(photo.SessionID,personID,texts.texts,labels.labelsTags,text.arrayNumbers,this.table);
+                        var person = new Person(photo.SessionID,personID,texts.texts,labels.labelsTags,texts.arrayNumbers,this.table);
                         await person.addPhoto(photo.PhotoID);
                         var photoUnClassified = await this.unClassified.getPhoto(ind);
                         await person.addPhoto(photoUnClassified);
