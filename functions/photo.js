@@ -65,7 +65,7 @@ module.exports = class Photo {
             };
             var photo = await s3Client.upload(params).promise();
             this.Location = photo.Location;
-            var db = this.saveDB(item);
+            var db = this.saveDB();
             return {
                 statusCode: 200,
                 data: photo
