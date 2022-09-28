@@ -7,7 +7,6 @@ env:
   enviromentName: QA
 jobs:
   Deployment:
-    needs: Infra
     runs-on: ubuntu-latest
     environment:
       name: QA
@@ -38,4 +37,4 @@ jobs:
       - name: Configutation
         run: |
           aws lambda update-function-configuration --function-name ${{ secrets.LAMBDAFUNCNAME }} \
-            --environment "Variables={DYNAMODB=photoEvent-Dynamo-photo,BUCKET=photoeventdev}" 
+            --environment "Variables={DYNAMODB=photoEvent,BUCKET=photoeventqa}" 
