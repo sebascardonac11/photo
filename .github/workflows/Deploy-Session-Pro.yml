@@ -1,0 +1,41 @@
+name: Deploy Session Production
+on:
+  push:
+    branches:
+    - main
+env:
+  enviromentName: pro
+jobs:
+  Deployment:
+    runs-on: ubuntu-latest
+    environment:
+      name: pro
+      url: https://d3ri3uhvzvztpt.cloudfront.net/
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Build
+        run: |
+          npm install
+      - name: Deploy
+        run: |
+          zip -r deploy.zip ./
+          aws lambda update-function-code \
+            --function-name ${{ secrets.LAMBDAFUNCNAME }} \
+            --zip-fil "fileb://./deploy.zip" \
+            --region ${{ secrets.AWS_REGION }} \
+      - name: Updating Function 
+        run: |
+          sleep 10
+      - name: Configutation
+        run: |
+          aws lambda update-function-configuration --function-name ${{ secrets.LAMBDAFUNCNAME }} \
+            --environment "Variables={DYNAMODB=photoEvent-Dynamo-photo,BUCKET=photoevent}" 
