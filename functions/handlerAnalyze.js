@@ -32,9 +32,9 @@ module.exports = class handlerAnalyze {
             
             var i = 0;
             for (i in personsDB) {
-                if (personsDB[i].analyzeText(texts.texts)) {
-                    personsDB[i].addPhoto(photo.PhotoID);
-                    personsDB[i].saveDB();
+                if (await personsDB[i].analyzeText(texts.texts)) {
+                    await personsDB[i].addPhoto(photo.PhotoID);
+                    await personsDB[i].saveDB();
                     console.log("Photo add in person: ",personsDB[i].mainsort);
                 }
             }
@@ -43,8 +43,8 @@ module.exports = class handlerAnalyze {
                     var ind = await this.unClassified.analyzeText(texts);
                     if (ind == -1) {
                         //Put photo in unclassified category
-                        this.unClassified.addPhoto(photo.PhotoID, texts.texts, labels.labelsTags, texts.arrayNumbers);
-                        this.unClassified.saveDB();
+                        await this.unClassified.addPhoto(photo.PhotoID, texts.texts, labels.labelsTags, texts.arrayNumbers);
+                        await this.unClassified.saveDB();
                         console.log("Photo add in unclassified category",this.unClassified.photos);
                     }else{
                         var person = new Person(photo.SessionID,personID,texts.texts,labels.labelsTags,text.arrayNumbers,this.table);

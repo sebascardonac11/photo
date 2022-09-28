@@ -63,7 +63,6 @@ module.exports = class Unclassified {
                     'numbers':this.numbers
                 }
             }
-            console.log(params)
             return await dynamo.put(params).promise();
         } catch (error) {
             console.log("Someting Wrong in Unclassified.saveDB ", error)
