@@ -11,21 +11,24 @@ module.exports = class Person {
     photos = [];
     labels = [];
     texts = [];
+    numbers =[]
     isUnClassified = false;
-    constructor( sessionID,personID,texts,labels,table) {
+    constructor( sessionID,personID,texts,labels,numbers,table) {
         this.DYNAMODBTABLE = table
         this.mainkey=sessionID;
         this.mainsort=personID;
         this.texts.push(texts);
         this.labels.push(labels);
+        this.numbers=numbers
     }
-    async load(sessionID,personID,texts,labels,photos,table) {
+    async load(sessionID,personID,texts,labels,numbers,photos,table) {
         this.DYNAMODBTABLE = table
         this.mainkey=sessionID;
         this.mainsort=personID;
         this.texts= texts;
         this.labels = labels;
         this.photos = photos;
+        this.numbers = numbers
     }
     /**
      * Return if texts are  in texts of the person.
@@ -33,12 +36,17 @@ module.exports = class Person {
     async analyzeText(Texts) {
         var photos = false
         for (const i in this.texts) {
-            var pos = -1;//Texts.indexOf(this.texts[i]);
+            var pos = Texts.indexOf(this.texts[i]);
             if (pos != -1) {
                 photos= true;
             }
         }
-        console.log('Textos Encontrados en las siguientes fotos: ', Texts);
+        for (const i in this.numbers) {
+            var pos = Texts.indexOf(this.texts[i]);
+            if (pos != -1) {
+                photos= true;
+            }
+        }
         return photos;
     }
     async saveDB() {
@@ -51,7 +59,8 @@ module.exports = class Person {
                     'entity': this.entity,
                     'photo': this.photos,
                     'texts': this.texts,
-                    'labels': this.labels
+                    'labels': this.labels,
+                    'numbers':this.numbers
                 }
             }
             return await dynamo.put(params).promise();

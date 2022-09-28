@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk');
-AWS.config.update({ region: 'us-east-2' });
+//AWS.config.update({ region: 'us-east-2' });
 
 const Dynamo = new AWS.DynamoDB.DocumentClient();
 const Rekognition = new AWS.Rekognition();
@@ -24,16 +24,17 @@ module.exports = class handlerAnalyze {
             var texts = await this.findRekognitionText(key);
             var labels = await this.findRekognitionLabels(key);
             var photo = new Photo(this.bucket, this.table);
-            await photo.loadMeta(key, texts.texts, labels.labelsTags);
+            await photo.loadMeta(key, texts.texts,texts.arrayNumbers, labels.labelsTags);
+            photo.saveDB();
+
             //Get persons of sessions
             var personsDB = await this.getPersons(photo.SessionID, photo)
             
             var i = 0;
             for (i in personsDB) {
-                if (personsDB[i].analyzeText(texts)) {
+                if (personsDB[i].analyzeText(texts.texts)) {
                     personsDB[i].addPhoto(photo.PhotoID);
                     personsDB[i].saveDB();
-                    console.log("Add person");
                 }
             }
             if (i == 0) {
@@ -44,12 +45,11 @@ module.exports = class handlerAnalyze {
                         this.unClassified.addPhoto(photo.PhotoID, texts.texts, labels.labelsTags, texts.arrayNumbers);
                         this.unClassified.saveDB();
                     }else{
-                        var person = new Person(photo.SessionID,personID,texts.texts,labels.labelsTags,this.table);
+                        var person = new Person(photo.SessionID,personID,texts.texts,labels.labelsTags,text.arrayNumbers,this.table);
                         person.addPhoto(photo.PhotoID);
                         var photoUnClassified = await this.unClassified.getPhoto(ind);
                         person.addPhoto(photoUnClassified);
                         person.saveDB();
-                        //console.log("Antes de eliminar",this.unClassified);
                         this.unClassified.deletePhoto(ind);
                         this.unClassified.saveDB();
                     }
@@ -57,7 +57,6 @@ module.exports = class handlerAnalyze {
                     //Put photo in unclassified category
                     this.saveUnClassified(photo, texts, labels);
                 }
-                //console.log(this.unClassified);
             }
         } catch (error) {
             console.log("Something wrong in handlerAnalyze.analyse: ", error)
@@ -93,6 +92,7 @@ module.exports = class handlerAnalyze {
                         personsDB.Items[key].mainsort,
                         personsDB.Items[key].texts,
                         personsDB.Items[key].labels,
+                        personsDB.Items[key].numbers,
                         personsDB.Items[key].photo, this.table);
                     persons.push(person);
                 } else {
@@ -135,7 +135,6 @@ module.exports = class handlerAnalyze {
                 onlyLetters.toUpperCase;
                 if (texts.search(onlyLetters) == -1 && onlyLetters != '') {
                     texts += onlyLetters + "-";
-                    //console.log("Numeros en texto: ",onlyNumbers);
                     arrayTexts.push(onlyLetters);
 
                 }
@@ -146,7 +145,7 @@ module.exports = class handlerAnalyze {
             });
             return { 'texts': texts, 'arrayTexts': arrayTexts, 'arrayNumbers': arrayNumbers };
         } catch (error) {
-            console.log("Something wrong in photo.getText: ", error)
+            console.log("Something wrong in handlerAnalyze.findRekognitionText: ", error)
         }
     }
     /**
@@ -175,7 +174,7 @@ module.exports = class handlerAnalyze {
 
             return { 'labelsTags': labelsTags, arrayTags: arraylabels };
         } catch (error) {
-            console.log("Something wrong in photo.getLabel: ", error)
+            console.log("Something wrong in handlerAnalyze.findRekognitionLabels: ", error)
         }
     }
 

@@ -2,26 +2,54 @@ const AWS = require('aws-sdk');
 //AWS.config.update({ region: 'us-east-2' });
 
 const s3Client = new AWS.S3();
-const Str = require('@supercharge/strings');
-
 const dynamo = new AWS.DynamoDB.DocumentClient();
+const Str = require('@supercharge/strings');
 module.exports = class Photo {
     BUCKET;
     DYNAMODBTABLE;
     SessionID;
     Key;
     PhotoID;
+    Photographer;
+    FileName;
+    Location;
+    Event;
     Lables = [];
     Texts = [];
+    Numbers = [];
     constructor(bucket, table) {
         this.BUCKET = bucket;
         this.DYNAMODBTABLE = table
+        this.Entity = 'PHOTO';
     }
-
+    async loadDB() {
+        try {
+            var params = {
+                TableName: this.DYNAMODBTABLE,
+                KeyConditionExpression: 'mainkey = :hashKey and mainsort = :hasSort',
+                ExpressionAttributeValues: {
+                    ':hashKey': this.SessionID,
+                    ':hasSort': this.PhotoID
+                }
+            }
+            var thisPhoto = await dynamo.query(params).promise();
+            if (thisPhoto.Count > 0) {
+                this.Location = thisPhoto.Items[0].location
+                this.FileName = thisPhoto.Items[0].name
+            }
+        } catch (error) {
+            console.log("Someting Wrong in Photo.loadDB ", error)
+            return null;
+        }
+    }
     async putPhoto(fileName, contentType, body, email, event, session) {
         try {
+            this.SessionID = session;
+            this.Photographer = email;
+            this.Event = event
+            this.FileName = fileName
             const uuid = Str.uuid();
-            var photoID = 'PHOTO-' + uuid;
+            this.PhotoID = 'PHOTO-' + uuid;
             var filePath = "photoClient/" + event + "/" + session + "/" + fileName;
             var params = {
                 Bucket: this.BUCKET,
@@ -32,20 +60,11 @@ module.exports = class Photo {
                     "Photographer": email,
                     "Session": session,
                     "Event": event,
-                    "photoID": photoID
+                    "photoID": this.photoID
                 }
             };
             var photo = await s3Client.upload(params).promise();
-            var item = {
-                'mainkey': session,
-                'mainsort': photoID,
-                'entity': 'PHOTO',
-                'photographer': email,
-                'event': event,
-                'name': fileName,
-                'filePath': filePath,
-                'location': photo.Location
-            }
+            this.Location = photo.Location;
             var db = this.saveDB(item);
             return {
                 statusCode: 200,
@@ -59,8 +78,23 @@ module.exports = class Photo {
             }
         }
     }
-    async saveDB(item) {
+    async saveDB() {
         try {
+            var date = new Date();
+            var item = {
+                'mainkey': this.SessionID,
+                'mainsort': this.PhotoID,
+                'date':date.getUTCFullYear()+'/'+date.getMonth()+'/'+date.getDay(),
+                'entity': this.Entity,
+                'photographer': this.Photographer,
+                'event': this.Event,
+                'name': this.FileName,
+                'filePath': this.Key,
+                'location': this.Location,
+                'numbers': this.Numbers,
+                'texts':this.Texts,
+                'labels':this.Lables
+            }
             var params = {
                 TableName: this.DYNAMODBTABLE,
                 Item: item
@@ -74,29 +108,18 @@ module.exports = class Photo {
             };
         }
     }
-    async putTagging(Texts, Labes) {
-        var params = { Bucket: this.BUCKET, Key: this.Key };
-        params.Tagging = {
-            TagSet: [
-                {
-                    Key: "Labels",
-                    Value: Labes
-                },
-                {
-                    Key: "Texts",
-                    Value: Texts
-                },]
-        }
-        await s3Client.putObjectTagging(params).promise();
-    }
-    async loadMeta(key, texts, labels) {
+    async loadMeta(key, texts,numbers, labels) {
         try {
             var metadata = await s3Client.headObject({ Bucket: this.BUCKET, Key: key }).promise();
             this.SessionID = metadata.Metadata.session;
             this.PhotoID = metadata.Metadata.photoid;
+            this.Event = metadata.Metadata.event;
+            this.Photographer = metadata.Metadata.photographer;
             this.Key = key;
             this.Texts.push(texts);
             this.Lables.push(labels);
+            this.Numbers=numbers
+            await this.loadDB();
             s3Client.putObjectTagging({
                 Bucket: this.BUCKET, Key: key,
                 Tagging: {
