@@ -48,17 +48,17 @@ module.exports = class handlerAnalyze {
                         console.log("Photo add in unclassified category",this.unClassified.photos);
                     }else{
                         var person = new Person(photo.SessionID,personID,texts.texts,labels.labelsTags,text.arrayNumbers,this.table);
-                        person.addPhoto(photo.PhotoID);
+                        await person.addPhoto(photo.PhotoID);
                         var photoUnClassified = await this.unClassified.getPhoto(ind);
-                        person.addPhoto(photoUnClassified);
-                        person.saveDB();
-                        this.unClassified.deletePhoto(ind);
-                        this.unClassified.saveDB();
+                        await person.addPhoto(photoUnClassified);
+                        await person.saveDB();
+                        await this.unClassified.deletePhoto(ind);
+                        await this.unClassified.saveDB();
                         console.log("Photo add in new person", personID);
                     }
                 } else {
                     //Put photo in unclassified category
-                    this.saveUnClassified(photo, texts, labels);
+                    await this.saveUnClassified(photo, texts, labels);
                     console.log("Photo add in unclassified category");
                 }
             }
@@ -73,8 +73,8 @@ module.exports = class handlerAnalyze {
     async saveUnClassified(photo, texts, labels) {
         var unclassifiedID = 'PERSON-' + photo.SessionID.split('SESSION-')[1]
         this.unClassified = new Unclassified();
-        this.unClassified.load(photo.SessionID, unclassifiedID, texts.texts, labels.labelsTags,photo.PhotoID ,texts.arrayNumbers,this.table);
-        this.unClassified.saveDB();
+        await this.unClassified.load(photo.SessionID, unclassifiedID, texts.texts, labels.labelsTags,photo.PhotoID ,texts.arrayNumbers,this.table);
+        await this.unClassified.saveDB();
     }
     async getPersons(sessionID, photo) {
         try {
