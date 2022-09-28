@@ -60,7 +60,7 @@ module.exports = class Photo {
                     "Photographer": email,
                     "Session": session,
                     "Event": event,
-                    "photoID": this.photoID
+                    "photoID": this.PhotoID
                 }
             };
             var photo = await s3Client.upload(params).promise();
