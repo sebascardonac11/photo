@@ -20,7 +20,7 @@ exports.handler = async function (event, context, callback) {
     case 'GET':
       console.log("### GET ####");
       if (event.resource == '/photos/person') {
-        response = photo.getPhotosPerson(event.queryStringParameters.event,event.queryStringParameters.number)
+        response = await photo.getPhotosPerson(event.queryStringParameters.event,event.queryStringParameters.number)
       }
       break;
     default:
