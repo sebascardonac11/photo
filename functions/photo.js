@@ -138,4 +138,25 @@ module.exports = class Photo {
             console.log("Something wrong in photo.loadMeta: ", error)
         }
     }
+    async getPhotosPerson(event,number){
+        try{
+            var params = {
+                TableName: this.table,
+                ExpressionAttributeValues: {
+                    ':hashKey': event,
+                    ':entity': 'PHOTO'
+                },
+                KeyConditionExpression: 'mainkey =:hashKey',
+                FilterExpression: 'entity=:entity'
+            }
+            var photosDB = await Dynamo.query(params).promise();
+            return {
+                statusCode: 200,
+                data: photosDB
+            }
+        } catch (error) {
+            console.log("Someting Wrong in Photo.getPhotosPerson ", error)
+            return [];
+        }
+    }
 }

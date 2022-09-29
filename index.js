@@ -18,10 +18,8 @@ exports.handler = async function (event, context, callback) {
       response = await photo.putPhoto(form.files[0].filename, contenType, body, authorizationDecoded.email, form.event, form.session);
       break;
     case 'GET':
-      console.log("Resource: ", event.resource)
-      response = {
-        statusCode: 200,
-        data: "Testing"
+      if (event.resource == '/photos/person') {
+        response = photo.getPhotosPerson(event.queryStringParameters.event,event.queryStringParameters.number)
       }
       break;
     default:
