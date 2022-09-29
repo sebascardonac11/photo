@@ -155,7 +155,6 @@ module.exports = class Photo {
             var resPhoto=[];
             for (const i in photosDB.Items) {
                 if (this.findPerson(number),photosDB.Items[i]) {
-
                     const presignedURL = s3Client.getSignedUrl('getObject', {
                         Bucket: this.BUCKET,
                         Key: photosDB.Items[i].filePath,
@@ -165,9 +164,10 @@ module.exports = class Photo {
                     resPhoto.push(photosDB.Items[i]);
                 }
             }
+            console.log("resPhoto",resPhoto)
             return {
                 statusCode: 200,
-                data: resPhoto
+                data: {Items:resPhoto}
             }
         } catch (error) {
             console.log("Someting Wrong in Photo.getPhotosPerson ", error)
@@ -180,7 +180,8 @@ module.exports = class Photo {
     async findPerson(number,Item) {
         var isPerson=false;
         for (const key in Item.numbers) {
-            if((Item.numbers[key]+"").search(number))
+            console.log("PhotoNumber",Item.numbers[key])
+            if(Item.numbers[key]==number)
                 isPerson = true;
         }
         return isPerson;
