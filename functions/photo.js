@@ -150,6 +150,14 @@ module.exports = class Photo {
                 FilterExpression: 'entity=:entity'
             }
             var photosDB = await dynamo.query(params).promise();
+            for (const i in photosDB.Items) {
+                const presignedURL = s3Client.getSignedUrl('getObject', {
+                    Bucket: this.BUCKET,
+                    Key: photosDB.Items[i].filePath,
+                    Expires: 10
+                });
+                photosDB.Items[i].location = presignedURL;
+            }
             return {
                 statusCode: 200,
                 data: photosDB
