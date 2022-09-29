@@ -82,12 +82,12 @@ module.exports = class Photo {
         try {
             var date = new Date();
             var item = {
-                'mainkey': this.SessionID,
+                'mainkey': this.Event,
                 'mainsort': this.PhotoID,
                 'date':date.getUTCFullYear()+'/'+date.getMonth()+'/'+date.getDay(),
                 'entity': this.Entity,
                 'photographer': this.Photographer,
-                'event': this.Event,
+                'session': this.SessionID,
                 'name': this.FileName,
                 'filePath': this.Key,
                 'location': this.Location,
