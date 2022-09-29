@@ -154,7 +154,7 @@ module.exports = class Photo {
             var photosDB = await dynamo.query(params).promise();
             var resPhoto=[];
             for (const i in photosDB.Items) {
-                if (this.findPerson(number),photosDB.Items[i]) {
+                if (await this.findPerson(number),photosDB.Items[i]) {
                     const presignedURL = s3Client.getSignedUrl('getObject', {
                         Bucket: this.BUCKET,
                         Key: photosDB.Items[i].filePath,
