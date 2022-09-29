@@ -149,15 +149,17 @@ module.exports = class Photo {
                 KeyConditionExpression: 'mainkey =:hashKey',
                 FilterExpression: 'entity=:entity'
             }
-            console.log("Parametros a consultar: ",params);
-            var photosDB = await Dynamo.query(params).promise();
+            var photosDB = await dynamo.query(params).promise();
             return {
                 statusCode: 200,
                 data: photosDB
             }
         } catch (error) {
             console.log("Someting Wrong in Photo.getPhotosPerson ", error)
-            return [];
+            return {
+                statusCode: 400,
+                data: "Someting Wrong in Photo.getPhotosPerson "
+            };
         }
     }
 }
