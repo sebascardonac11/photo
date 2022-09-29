@@ -152,8 +152,8 @@ module.exports = class Photo {
                 FilterExpression: 'entity=:entity'
             }
             var photosDB = await dynamo.query(params).promise();
+            var resPhoto=[];
             for (const i in photosDB.Items) {
-
                 if (this.findPerson(number),photosDB.Items[i]) {
 
                     const presignedURL = s3Client.getSignedUrl('getObject', {
@@ -162,13 +162,12 @@ module.exports = class Photo {
                         Expires: 10
                     });
                     photosDB.Items[i].location = presignedURL;
-                }else{
-                    photosDB.Items.splice(i, 1);
+                    resPhoto.push(photosDB.Items[i]);
                 }
             }
             return {
                 statusCode: 200,
-                data: photosDB
+                data: resPhoto
             }
         } catch (error) {
             console.log("Someting Wrong in Photo.getPhotosPerson ", error)
