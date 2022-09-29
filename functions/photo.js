@@ -22,6 +22,18 @@ module.exports = class Photo {
         this.DYNAMODBTABLE = table
         this.Entity = 'PHOTO';
     }
+    async loadPhotoFromJson(obj) {
+        this.SessionID = obj['session'];
+        this.Key = obj['filePath'];
+        this.PhotoID = obj['mainsort'];
+        this.Photographer = obj['photographer'];
+        this.FileName = obj['name'];
+        this.Location = obj['location'];
+        this.Event = obj['mainkey'];
+        this.Lables = obj['labels'];
+        this.Texts = obj['texts'];
+        this.Numbers = obj['numbers'];
+    }
     async loadDB() {
         try {
             var params = {
@@ -152,9 +164,9 @@ module.exports = class Photo {
                 FilterExpression: 'entity=:entity'
             }
             var photosDB = await dynamo.query(params).promise();
-            var resPhoto=[];
+            var resPhoto = [];
             for (const i in photosDB.Items) {
-                if (await this.findPerson(number,photosDB.Items[i])) {
+                if (await this.findPerson(number, photosDB.Items[i])) {
                     const presignedURL = s3Client.getSignedUrl('getObject', {
                         Bucket: this.BUCKET,
                         Key: photosDB.Items[i].filePath,
@@ -164,10 +176,10 @@ module.exports = class Photo {
                     resPhoto.push(photosDB.Items[i]);
                 }
             }
-            console.log("resPhoto",resPhoto)
+            console.log("resPhoto", resPhoto)
             return {
                 statusCode: 200,
-                data: {Items:resPhoto}
+                data: { Items: resPhoto }
             }
         } catch (error) {
             console.log("Someting Wrong in Photo.getPhotosPerson ", error)
@@ -177,11 +189,10 @@ module.exports = class Photo {
             };
         }
     }
-    async findPerson(number,Item) {
-        console.log("PhotoNumber",Item)
-        var isPerson=false;
-        for (const key in Item.numbers) {
-            if(Item.numbers[key]==number)
+    async findPerson(number) {
+        var isPerson = false;
+        for (const key in this.Numbers) {
+            if (this.Numbers[key] == number)
                 isPerson = true;
         }
         return isPerson;

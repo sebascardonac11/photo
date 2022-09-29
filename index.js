@@ -2,6 +2,7 @@ const Photo = require('./functions/photo')
 const jwt_decode = require('jwt-decode');
 const parser = require('lambda-multipart-parser');
 const handlerAnalyze = require('./functions/handlerAnalyze');
+const Photos = require('./functions/photos');
 exports.handler = async function (event, context, callback) {
   console.log("Event Photo: ", JSON.stringify(event));
   var photo = new Photo(process.env.BUCKET, process.env.DYNAMODB);
@@ -20,7 +21,8 @@ exports.handler = async function (event, context, callback) {
     case 'GET':
       console.log("### GET ####");
       if (event.resource == '/photos/person') {
-        response = await photo.getPhotosPerson(event.queryStringParameters.event,event.queryStringParameters.number)
+        var photos = new Photos(process.env.BUCKET, process.env.DYNAMODB);
+        response = await photos.getPhotosPerson(event.queryStringParameters.event,event.queryStringParameters.number)
       }
       break;
     default:
