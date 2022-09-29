@@ -36,6 +36,8 @@ module.exports = class Photo {
             if (thisPhoto.Count > 0) {
                 this.Location = thisPhoto.Items[0].location
                 this.FileName = thisPhoto.Items[0].name
+                this.Key = thisPhoto.Items[0].filePath
+
             }
         } catch (error) {
             console.log("Someting Wrong in Photo.loadDB ", error)
@@ -84,7 +86,7 @@ module.exports = class Photo {
             var item = {
                 'mainkey': this.Event,
                 'mainsort': this.PhotoID,
-                'date':date.getUTCFullYear()+'/'+date.getMonth()+'/'+date.getDay(),
+                'date': date.getUTCFullYear() + '/' + date.getMonth() + '/' + date.getDay(),
                 'entity': this.Entity,
                 'photographer': this.Photographer,
                 'session': this.SessionID,
@@ -92,8 +94,8 @@ module.exports = class Photo {
                 'filePath': this.Key,
                 'location': this.Location,
                 'numbers': this.Numbers,
-                'texts':this.Texts,
-                'labels':this.Lables
+                'texts': this.Texts,
+                'labels': this.Lables
             }
             var params = {
                 TableName: this.DYNAMODBTABLE,
@@ -108,7 +110,7 @@ module.exports = class Photo {
             };
         }
     }
-    async loadMeta(key, texts,numbers, labels) {
+    async loadMeta(key, texts, numbers, labels) {
         try {
             var metadata = await s3Client.headObject({ Bucket: this.BUCKET, Key: key }).promise();
             this.SessionID = metadata.Metadata.session;
@@ -118,7 +120,7 @@ module.exports = class Photo {
             this.Key = key;
             this.Texts.push(texts);
             this.Lables.push(labels);
-            this.Numbers=numbers
+            this.Numbers = numbers
             await this.loadDB();
             s3Client.putObjectTagging({
                 Bucket: this.BUCKET, Key: key,
@@ -138,8 +140,8 @@ module.exports = class Photo {
             console.log("Something wrong in photo.loadMeta: ", error)
         }
     }
-    async getPhotosPerson(event,number){
-        try{
+    async getPhotosPerson(event, number) {
+        try {
             var params = {
                 TableName: this.DYNAMODBTABLE,
                 ExpressionAttributeValues: {
@@ -151,12 +153,17 @@ module.exports = class Photo {
             }
             var photosDB = await dynamo.query(params).promise();
             for (const i in photosDB.Items) {
-                const presignedURL = s3Client.getSignedUrl('getObject', {
-                    Bucket: this.BUCKET,
-                    Key: photosDB.Items[i].filePath,
-                    Expires: 10
-                });
-                photosDB.Items[i].location = presignedURL;
+                if (this.findPerson(number)) {
+
+                    const presignedURL = s3Client.getSignedUrl('getObject', {
+                        Bucket: this.BUCKET,
+                        Key: photosDB.Items[i].filePath,
+                        Expires: 10
+                    });
+                    photosDB.Items[i].location = presignedURL;
+                }else{
+                    photosDB.splice(i, 1);
+                }
             }
             return {
                 statusCode: 200,
@@ -169,5 +176,13 @@ module.exports = class Photo {
                 data: "Someting Wrong in Photo.getPhotosPerson "
             };
         }
+    }
+    async findPerson(number) {
+        var isPerson=false;
+        for (const key in this.Numbers) {
+            if((this.Numbers[key]+"").search(number))
+                isPerson = true;
+        }
+        return isPerson;
     }
 }
