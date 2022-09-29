@@ -153,7 +153,8 @@ module.exports = class Photo {
             }
             var photosDB = await dynamo.query(params).promise();
             for (const i in photosDB.Items) {
-                if (this.findPerson(number)) {
+
+                if (this.findPerson(number),photosDB.Items[i]) {
 
                     const presignedURL = s3Client.getSignedUrl('getObject', {
                         Bucket: this.BUCKET,
@@ -162,7 +163,7 @@ module.exports = class Photo {
                     });
                     photosDB.Items[i].location = presignedURL;
                 }else{
-                    photosDB.splice(i, 1);
+                    photosDB.Items.splice(i, 1);
                 }
             }
             return {
@@ -177,10 +178,10 @@ module.exports = class Photo {
             };
         }
     }
-    async findPerson(number) {
+    async findPerson(number,Item) {
         var isPerson=false;
-        for (const key in this.Numbers) {
-            if((this.Numbers[key]+"").search(number))
+        for (const key in Item.numbers) {
+            if((Item.numbers[key]+"").search(number))
                 isPerson = true;
         }
         return isPerson;
