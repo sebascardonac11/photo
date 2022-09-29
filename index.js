@@ -17,10 +17,17 @@ exports.handler = async function (event, context, callback) {
       var body = Buffer.from(form.files[0].content);
       response = await photo.putPhoto(form.files[0].filename, contenType, body, authorizationDecoded.email, form.event, form.session);
       break;
+    case 'GET':
+      console.log("Resource: ", event.resource)
+      response = {
+        statusCode: 200,
+        data: "Testing"
+      }
+      break;
     default:
       console.log("### ANALYZE PHOTO ####");
       //var analyzePhoto=new handlerAnalyze(event,'photoeventdev','photoEvent');
-      var analyzePhoto=new handlerAnalyze(event,process.env.BUCKET, process.env.DYNAMODB);
+      var analyzePhoto = new handlerAnalyze(event, process.env.BUCKET, process.env.DYNAMODB);
       for (const i in event.Records) {
         const Key = event.Records[i].s3.object.key;
         response = await analyzePhoto.analyse(Key);
