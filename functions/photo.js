@@ -141,7 +141,7 @@ module.exports = class Photo {
     async getPhotosPerson(event,number){
         try{
             var params = {
-                TableName: this.table,
+                TableName: this.DYNAMODBTABLE,
                 ExpressionAttributeValues: {
                     ':hashKey': event,
                     ':entity': 'PHOTO'
