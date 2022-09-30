@@ -53,8 +53,6 @@ module.exports = class Photo {
             if (thisPhoto.Count > 0) {
                 this.Location = thisPhoto.Items[0].location
                 this.FileName = thisPhoto.Items[0].name
-                this.Key = thisPhoto.Items[0].filePath
-
             }
         } catch (error) {
             console.log("Someting Wrong in Photo.loadDB ", error)
