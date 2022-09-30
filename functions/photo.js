@@ -47,7 +47,9 @@ module.exports = class Photo {
                     ':hasSort': this.PhotoID
                 }
             }
+            console.log("Photo load: ",params);
             var thisPhoto = await dynamo.query(params).promise();
+            console.log("Photo load: ",thisPhoto);
             if (thisPhoto.Count > 0) {
                 this.Location = thisPhoto.Items[0].location
                 this.FileName = thisPhoto.Items[0].name
@@ -137,7 +139,6 @@ module.exports = class Photo {
             this.Lables.push(labels);
             this.Numbers = numbers
             await this.loadDB();
-            console.log("Photo load: ",this);
             s3Client.putObjectTagging({
                 Bucket: this.BUCKET, Key: key,
                 Tagging: {
