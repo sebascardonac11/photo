@@ -16,6 +16,7 @@ module.exports = class Photo {
     Photographer;
     FileName;
     Location;
+    Date;
     Event;
     Lables = [];
     Texts = [];
@@ -36,6 +37,7 @@ module.exports = class Photo {
         this.Lables = obj['labels'];
         this.Texts = obj['texts'];
         this.Numbers = obj['numbers'];
+        this.Date= obj['date']
     }
     async loadDB() {
         try {
