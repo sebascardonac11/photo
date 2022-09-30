@@ -1,4 +1,8 @@
 const AWS = require('aws-sdk');
+AWS.config.update({
+    maxRetries: 15,
+    retryDelayOptions: {base: 500}
+  });
 //AWS.config.update({ region: 'us-east-2' });
 
 const s3Client = new AWS.S3();
@@ -35,10 +39,10 @@ module.exports = class Photos {
                         Key: photosDB.Items[i].filePath,
                         Expires: 10
                     });
-                    photo.location=presignedURL;
+                    photo.Location=presignedURL;
                     console.log("photo",photo);
                     photosDB.Items[i].location = presignedURL;
-                    resPhoto.push(photosDB.Items[i]);
+                    resPhoto.push(photo);
                 }
             }
             console.log("resPhoto",resPhoto)

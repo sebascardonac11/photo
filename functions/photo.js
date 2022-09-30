@@ -1,6 +1,9 @@
 const AWS = require('aws-sdk');
 //AWS.config.update({ region: 'us-east-2' });
-
+AWS.config.update({
+    maxRetries: 15,
+    retryDelayOptions: {base: 500}
+  });
 const s3Client = new AWS.S3();
 const dynamo = new AWS.DynamoDB.DocumentClient();
 const Str = require('@supercharge/strings');
@@ -134,6 +137,7 @@ module.exports = class Photo {
             this.Lables.push(labels);
             this.Numbers = numbers
             await this.loadDB();
+            console.log("Photo load: ",this);
             s3Client.putObjectTagging({
                 Bucket: this.BUCKET, Key: key,
                 Tagging: {
