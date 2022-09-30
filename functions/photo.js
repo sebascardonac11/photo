@@ -43,7 +43,7 @@ module.exports = class Photo {
                 TableName: this.DYNAMODBTABLE,
                 KeyConditionExpression: 'mainkey = :hashKey and mainsort = :hasSort',
                 ExpressionAttributeValues: {
-                    ':hashKey': this.SessionID,
+                    ':hashKey': this.Event,
                     ':hasSort': this.PhotoID
                 }
             }
