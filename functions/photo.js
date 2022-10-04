@@ -236,6 +236,7 @@ module.exports = class Photo {
                 Body: buffer,
                 ContentType: "image"
             };
+            console.log("Img thumbnail",destparams)
             const putResult = await s3Client.putObject(destparams).promise();
         } catch (error) {
             console.log(error);
