@@ -33,14 +33,16 @@ module.exports = class Photos {
             for (const i in photosDB.Items) {
                 var photo = new Photo(this.BUCKET,this.DYNAMODBTABLE); 
                 photo.loadPhotoFromJson(photosDB.Items[i]);
-                var filePath=photosDB.Items[i].filePath+"";
-                filePath.replace('photoClient', 'thumbnail')
+            
                 if (await photo.findPerson(number)) {
+                    var filePath=photosDB.Items[i].filePath+"";
+                    filePath.replace('photoClient', 'thumbnail');
                     const presignedURL = s3Client.getSignedUrl('getObject', {
                         Bucket: this.BUCKET,
                         Key: filePath,
                         Expires: 10
                     });
+                    photo.filePath=filePath
                     photo.Location=presignedURL;
                     console.log("photo",photo);
                     photosDB.Items[i].location = presignedURL;
