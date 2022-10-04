@@ -20,15 +20,15 @@ exports.handler = async function (event, context, callback) {
       break;
     case 'GET':
       console.log("### GET ####");
+      if (event.resource == '/photos') {
+        var photos = new Photos(process.env.BUCKET, process.env.DYNAMODB);
+        response = await photos.getPhotosSession(event.queryStringParameters.session)
+      }
       if (event.resource == '/photos/person') {
         var photos = new Photos(process.env.BUCKET, process.env.DYNAMODB);
         response = await photos.getPhotosPerson(event.queryStringParameters.event,event.queryStringParameters.number)
-      }else{
-        response={
-          statusCode: 200,
-          data: "Otra cosa "
       }
-      }
+      
       break;
     default:
       

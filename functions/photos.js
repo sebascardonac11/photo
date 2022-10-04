@@ -48,7 +48,6 @@ module.exports = class Photos {
                     resPhoto.push(photo);
                 }
             }
-            console.log("resPhoto",resPhoto)
             return {
                 statusCode: 200,
                 data: {Items:resPhoto}
@@ -58,6 +57,20 @@ module.exports = class Photos {
             return {
                 statusCode: 400,
                 data: "Someting Wrong in Photo.getPhotosPerson "
+            };
+        }
+    }
+    async getPhotosSession(session){
+        try {
+            return {
+                statusCode: 200,
+                data:"Aqui van las fotos"
+            }
+        } catch (error) {
+            console.log("Someting Wrong in Photo.getPhotosSession ", error)
+            return {
+                statusCode: 400,
+                data: "Someting Wrong in Photo.getPhotosSession "
             };
         }
     }
