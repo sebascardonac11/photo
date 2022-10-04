@@ -210,7 +210,7 @@ module.exports = class Photo {
                 Bucket: this.BUCKET,
                 Key: this.Key
             };
-            var origimage = await s3.getObject(params).promise();
+            var origimage = await s3Client.getObject(params).promise();
 
         } catch (error) {
             console.log(error);
@@ -236,7 +236,7 @@ module.exports = class Photo {
                 Body: buffer,
                 ContentType: "image"
             };
-            const putResult = await s3.putObject(destparams).promise();
+            const putResult = await s3Client.putObject(destparams).promise();
         } catch (error) {
             console.log(error);
             return;
