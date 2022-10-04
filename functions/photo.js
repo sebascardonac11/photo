@@ -153,9 +153,7 @@ module.exports = class Photo {
                             Value: texts
                         },]
                 }
-            }).promise().catch(function (error) {
-                console.log("photo.loadMeta",error);
-           });;
+            }).promise();
         } catch (error) {
             console.log("Something wrong in photo.loadMeta: ", error)
         }
