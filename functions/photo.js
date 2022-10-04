@@ -2,8 +2,8 @@ const AWS = require('aws-sdk');
 //AWS.config.update({ region: 'us-east-2' });
 AWS.config.update({
     maxRetries: 15,
-    retryDelayOptions: {base: 500}
-  });
+    retryDelayOptions: { base: 500 }
+});
 const s3Client = new AWS.S3();
 const dynamo = new AWS.DynamoDB.DocumentClient();
 const Str = require('@supercharge/strings');
@@ -37,7 +37,7 @@ module.exports = class Photo {
         this.Lables = obj['labels'];
         this.Texts = obj['texts'];
         this.Numbers = obj['numbers'];
-        this.Date= obj['date']
+        this.Date = obj['date']
     }
     async loadDB() {
         try {
@@ -49,9 +49,9 @@ module.exports = class Photo {
                     ':hasSort': this.PhotoID
                 }
             }
-            console.log("Photo load: ",params);
+            console.log("Photo load: ", params);
             var thisPhoto = await dynamo.query(params).promise();
-            console.log("Photo load: ",thisPhoto);
+            console.log("Photo load: ", thisPhoto);
             if (thisPhoto.Count > 0) {
                 this.Location = thisPhoto.Items[0].location
                 this.FileName = thisPhoto.Items[0].name
@@ -201,5 +201,48 @@ module.exports = class Photo {
                 isPerson = true;
         }
         return isPerson;
+    }
+    async createThumbnail() {
+        const sharp = require('sharp');
+        // Download the image from the S3 source bucket.
+        try {
+            const params = {
+                Bucket: this.BUCKET,
+                Key: this.Key
+            };
+            var origimage = await s3.getObject(params).promise();
+
+        } catch (error) {
+            console.log(error);
+            return;
+        }
+
+        // set thumbnail width. Resize will set the height automatically to maintain aspect ratio.
+        const width = 100;
+        // Use the sharp module to resize the image and save in a buffer.
+        try {
+            var buffer = await sharp(origimage.Body).resize(width).toBuffer();
+
+        } catch (error) {
+            console.log(error);
+            return;
+        }
+        // Upload the thumbnail image to the destination bucket
+        try {
+            var filePath = "photoClient/thumbnail" + this.Event + "/" + this.session + "/" + this.FileName;
+            const destparams = {
+                Bucket: this.BUCKET,
+                Key: filePath,
+                Body: buffer,
+                ContentType: "image"
+            };
+            const putResult = await s3.putObject(destparams).promise();
+        } catch (error) {
+            console.log(error);
+            return;
+        }
+
+
+
     }
 }
