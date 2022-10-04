@@ -140,20 +140,7 @@ module.exports = class Photo {
             this.Lables.push(labels);
             this.Numbers = numbers
             await this.loadDB();
-            await s3Client.putObjectTagging({
-                Bucket: this.BUCKET, Key: key,
-                Tagging: {
-                    TagSet: [
-                        {
-                            Key: "Labels",
-                            Value: labels
-                        },
-                        {
-                            Key: "Texts",
-                            Value: texts
-                        },]
-                }
-            }).promise();
+         
         } catch (error) {
             console.log("Something wrong in photo.loadMeta: ", error)
         }
@@ -246,5 +233,27 @@ module.exports = class Photo {
 
 
 
+    }
+    async addTags(texts, labels){
+        try {
+            
+        await s3Client.putObjectTagging({
+            Bucket: this.BUCKET, Key: key,
+            Tagging: {
+                TagSet: [
+                    {
+                        Key: "Labels",
+                        Value: labels
+                    },
+                    {
+                        Key: "Texts",
+                        Value: texts
+                    },]
+            }
+        }).promise();
+    } catch (error) {
+        console.log("Something wrong in photo.addTags: ", error)
+        console.log(labels,texts)
+    }
     }
 }

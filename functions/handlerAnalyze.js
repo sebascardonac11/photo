@@ -27,6 +27,7 @@ module.exports = class handlerAnalyze {
             await photo.loadMeta(key, texts.texts,texts.arrayNumbers, labels.labelsTags);
             console.log("handlerAnalyze.analyse.photo",photo)
             await photo.createThumbnail();
+            photo.addTags(texts.texts, labels.labelsTags)
             await photo.saveDB();
 
             //Get persons of sessions

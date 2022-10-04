@@ -36,10 +36,10 @@ module.exports = class Photos {
             
                 if (await photo.findPerson(number)) {
                     var filePath=photosDB.Items[i].filePath+"";
-                    filePath.replace('photoClient', 'thumbnail');
+                    
                     const presignedURL = s3Client.getSignedUrl('getObject', {
                         Bucket: this.BUCKET,
-                        Key: filePath,
+                        Key: filePath.replace('photoClient', 'thumbnail'),
                         Expires: 10
                     });
                     photo.filePath=filePath
