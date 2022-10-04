@@ -53,6 +53,7 @@ module.exports = class Photo {
             if (thisPhoto.Count > 0) {
                 this.Location = thisPhoto.Items[0].location
                 this.FileName = thisPhoto.Items[0].name
+                this.Date = thisPhoto.Items[0].date
             }
         } catch (error) {
             console.log("Someting Wrong in Photo.loadDB ", error)
@@ -61,6 +62,8 @@ module.exports = class Photo {
     }
     async putPhoto(fileName, contentType, body, email, event, session) {
         try {
+            var date = new Date();
+            this.Date= date.getUTCFullYear() + '/' + date.getMonth() + '/' + date.getDay();
             this.SessionID = session;
             this.Photographer = email;
             this.Event = event
@@ -97,11 +100,11 @@ module.exports = class Photo {
     }
     async saveDB() {
         try {
-            var date = new Date();
+            
             var item = {
                 'mainkey': this.Event,
                 'mainsort': this.PhotoID,
-                'date': date.getUTCFullYear() + '/' + date.getMonth() + '/' + date.getDay(),
+                'date': this.Date,
                 'entity': this.Entity,
                 'photographer': this.Photographer,
                 'session': this.SessionID,

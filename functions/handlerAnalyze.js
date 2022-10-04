@@ -26,8 +26,8 @@ module.exports = class handlerAnalyze {
             var photo = new Photo(this.bucket, this.table);
             await photo.loadMeta(key, texts.texts,texts.arrayNumbers, labels.labelsTags);
             console.log("handlerAnalyze.analyse.photo",photo)
-            photo.createThumbnail();
-            photo.saveDB();
+            await photo.createThumbnail();
+            await photo.saveDB();
 
             //Get persons of sessions
             var personsDB = await this.getPersons(photo.SessionID, photo)
