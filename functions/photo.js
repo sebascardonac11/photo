@@ -206,7 +206,7 @@ module.exports = class Photo {
         }
 
         // set thumbnail width. Resize will set the height automatically to maintain aspect ratio.
-        const width = 100;
+        const width = 200;
         // Use the sharp module to resize the image and save in a buffer.
         try {
             var buffer = await sharp(origimage.Body).resize(width).toBuffer();
