@@ -230,7 +230,7 @@ module.exports = class Photo {
         }
         // Upload the thumbnail image to the destination bucket
         try {
-            var filePath = "thumbnail/" + this.Event + "/" + this.session + "/" + this.FileName;
+            var filePath = "thumbnail/" + this.Event + "/" + this.SessionID + "/" + this.FileName;
             const destparams = {
                 Bucket: this.BUCKET,
                 Key: filePath,
