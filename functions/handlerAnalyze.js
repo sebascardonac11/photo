@@ -25,6 +25,7 @@ module.exports = class handlerAnalyze {
             var labels = await this.findRekognitionLabels(key);
             var photo = new Photo(this.bucket, this.table);
             await photo.loadMeta(key, texts.texts,texts.arrayNumbers, labels.labelsTags);
+            console.log("handlerAnalyze.analyse.photo",photo)
             photo.createThumbnail();
             photo.saveDB();
 
