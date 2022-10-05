@@ -19,7 +19,7 @@ module.exports = class Photos {
     }
     async getPhotosPerson(event, number) {
         try {
-            var photosDB = this.getPhotoEvent(event);
+            var photosDB = await this.getPhotoEvent(event);
             var resPhoto = [];
             for (const i in photosDB.Items) {
                 var photo = new Photo(this.BUCKET, this.DYNAMODBTABLE);
@@ -53,7 +53,7 @@ module.exports = class Photos {
     }
     async getPhotosSession(session, event) {
         try {
-            var photosDB = this.getPhotoEvent(event);
+            var photosDB = await this.getPhotoEvent(event);
             return {
                 statusCode: 200,
                 data: photosDB
