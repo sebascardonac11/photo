@@ -22,7 +22,10 @@ exports.handler = async function (event, context, callback) {
       console.log("### GET ####");
       if (event.resource == '/photos') {
         var photos = new Photos(process.env.BUCKET, process.env.DYNAMODB);
-        response = await photos.getPhotosSession(event.queryStringParameters.session)
+        response = await photos.getPhotosSession(
+          event.queryStringParameters.session,
+          event.queryStringParameters.event
+          )
       }
       if (event.resource == '/photos/person') {
         var photos = new Photos(process.env.BUCKET, process.env.DYNAMODB);
