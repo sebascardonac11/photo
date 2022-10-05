@@ -22,14 +22,14 @@ module.exports = class Photos {
             var photosDB = await this.getPhotoEvent(event);
             var resPhoto = [];
             for (const i in photosDB) {
-                if (await photo.findPerson(number)) {
+                if (await photosDB[i].findPerson(number)) {
                     var filePath = photosDB[i].Key.replace('photoClient', 'thumbnail');
                     const presignedURL = s3Client.getSignedUrl('getObject', {
                         Bucket: this.BUCKET,
                         Key: filePath,
                         Expires: 10
                     });
-                    photosDB[i].location = Key;
+                    photosDB[i].location = presignedURL;
                     console.log("Foto agregada",photosDB[i])
                     resPhoto.push(photosDB[i]);
                 }
