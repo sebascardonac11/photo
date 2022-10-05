@@ -70,7 +70,7 @@ module.exports = class Photo {
             this.FileName = fileName
             const uuid = Str.uuid();
             this.PhotoID = 'PHOTO-' + uuid;
-            var filePath = "photoClient/" + event + "/" + session + "/" + fileName;
+            var filePath = "photoClient/" + event + "/" + session + "/" + PhotoID;
             var params = {
                 Bucket: this.BUCKET,
                 Body: body,
