@@ -230,9 +230,6 @@ module.exports = class Photo {
             console.log(error);
             return;
         }
-
-
-
     }
     async addTags(texts, labels){
         try {

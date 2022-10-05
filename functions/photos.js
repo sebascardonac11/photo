@@ -81,11 +81,11 @@ module.exports = class Photos {
                 KeyConditionExpression: 'mainkey =:hashKey',
                 FilterExpression: 'entity=:entity'
             }
-            var res= await dynamo.query(params).promise();
+            var photosDB= await dynamo.query(params).promise();
             var photos=[];
             for (const i in photosDB.Items) {
                 var photo = new Photo(this.BUCKET, this.DYNAMODBTABLE);
-                photo.loadPhotoFromJson(res.Items[i]);
+                photo.loadPhotoFromJson(photosDB.Items[i]);
                 photos.push(photo);
             }
             return photos;
