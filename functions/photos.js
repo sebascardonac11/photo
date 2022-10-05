@@ -21,22 +21,17 @@ module.exports = class Photos {
         try {
             var photosDB = await this.getPhotoEvent(event);
             var resPhoto = [];
-            for (const i in photosDB.Items) {
-                var photo = new Photo(this.BUCKET, this.DYNAMODBTABLE);
-                photo.loadPhotoFromJson(photosDB.Items[i]);
-
+            for (const i in photosDB) {
                 if (await photo.findPerson(number)) {
-                    var filePath = photosDB.Items[i].filePath.replace('photoClient', 'thumbnail');
+                    var filePath = photosDB[i].Key.replace('photoClient', 'thumbnail');
                     const presignedURL = s3Client.getSignedUrl('getObject', {
                         Bucket: this.BUCKET,
                         Key: filePath,
                         Expires: 10
                     });
-                    photo.filePath = filePath
-                    photo.Location = presignedURL;
-                    console.log("photo", photo);
-                    photosDB.Items[i].location = presignedURL;
-                    resPhoto.push(photo);
+                    photosDB[i].location = Key;
+                    console.log("Foto agregada",photosDB[i])
+                    resPhoto.push(photosDB[i]);
                 }
             }
             return {
@@ -86,7 +81,14 @@ module.exports = class Photos {
                 KeyConditionExpression: 'mainkey =:hashKey',
                 FilterExpression: 'entity=:entity'
             }
-            return await dynamo.query(params).promise();
+            var res= await dynamo.query(params).promise();
+            var photos=[];
+            for (const i in photosDB.Items) {
+                var photo = new Photo(this.BUCKET, this.DYNAMODBTABLE);
+                photo.loadPhotoFromJson(photosDB.Items[i]);
+                photos.push(photo);
+            }
+            return photos;
         } catch (error) {
             console.log("Someting Wrong in Photo.getPhotoEvent ", error)
             return {
