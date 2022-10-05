@@ -138,9 +138,8 @@ module.exports = class handlerAnalyze {
             var numbers=""
             var arrayNumbers = []
             data.TextDetections.forEach(text => {
-                const onlyLetters = text.DetectedText.replace(/[0-9]+/g, ""); // esto retorna 'abcd'
+                const onlyLetters = text.DetectedText.replace(/[0-9]+/g, "").toUpperCase(); // esto retorna 'abcd'
                 const onlyNumbers = text.DetectedText.replace(/[^0-9]+/g, "");
-                onlyLetters.toUpperCase;
                 if (texts.search(onlyLetters) == -1 && onlyLetters != '') {
                     texts += onlyLetters + "-";
                     arrayTexts.push(onlyLetters);
