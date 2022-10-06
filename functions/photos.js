@@ -36,7 +36,7 @@ module.exports = class Photos {
             }
             return {
                 statusCode: 200,
-                data: { Items: resPhoto }
+                data:  resPhoto 
             }
         } catch (error) {
             console.log("Someting Wrong in Photos.getPhotosPerson ", error)
