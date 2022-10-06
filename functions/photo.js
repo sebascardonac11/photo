@@ -145,42 +145,6 @@ module.exports = class Photo {
             console.log("Something wrong in photo.loadMeta: ", error)
         }
     }
-    async getPhotosPerson(event, number) {
-        try {
-            var params = {
-                TableName: this.DYNAMODBTABLE,
-                ExpressionAttributeValues: {
-                    ':hashKey': event,
-                    ':entity': 'PHOTO'
-                },
-                KeyConditionExpression: 'mainkey =:hashKey',
-                FilterExpression: 'entity=:entity'
-            }
-            var photosDB = await dynamo.query(params).promise();
-            var resPhoto = [];
-            for (const i in photosDB.Items) {
-                if (await this.findPerson(number, photosDB.Items[i])) {
-                    const presignedURL = s3Client.getSignedUrl('getObject', {
-                        Bucket: this.BUCKET,
-                        Key: photosDB.Items[i].filePath,
-                        Expires: 10
-                    });
-                    photosDB.Items[i].location = presignedURL;
-                    resPhoto.push(photosDB.Items[i]);
-                }
-            }
-            return {
-                statusCode: 200,
-                data: resPhoto
-            }
-        } catch (error) {
-            console.log("Someting Wrong in Photo.getPhotosPerson ", error)
-            return {
-                statusCode: 400,
-                data: "Someting Wrong in Photo.getPhotosPerson "
-            };
-        }
-    }
     async findPerson(number) {
         var isPerson = false;
         for (const key in this.Numbers) {
