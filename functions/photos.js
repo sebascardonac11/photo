@@ -30,13 +30,13 @@ module.exports = class Photos {
                         Expires: 10
                     });
                     photosDB[i].Location = presignedURL;
-                    console.log("Foto agregada",photosDB[i])
+                    console.log("Foto agregada", photosDB[i])
                     resPhoto.push(photosDB[i]);
                 }
             }
             return {
                 statusCode: 200,
-                data:  resPhoto 
+                data: resPhoto
             }
         } catch (error) {
             console.log("Someting Wrong in Photos.getPhotosPerson ", error)
@@ -49,6 +49,14 @@ module.exports = class Photos {
     async getPhotosSession(session, event) {
         try {
             var photosDB = await this.getPhotoEvent(event);
+            for (const i in photosDB) {
+                const presignedURL = s3Client.getSignedUrl('getObject', {
+                    Bucket: this.BUCKET,
+                    Key: photosDB[i].Key,
+                    Expires: 10
+                });
+                photosDB[i].Location = presignedURL;
+            }
             return {
                 statusCode: 200,
                 data: photosDB
@@ -81,8 +89,8 @@ module.exports = class Photos {
                 KeyConditionExpression: 'mainkey =:hashKey',
                 FilterExpression: 'entity=:entity'
             }
-            var photosDB= await dynamo.query(params).promise();
-            var photos=[];
+            var photosDB = await dynamo.query(params).promise();
+            var photos = [];
             for (const i in photosDB.Items) {
                 var photo = new Photo(this.BUCKET, this.DYNAMODBTABLE);
                 photo.loadPhotoFromJson(photosDB.Items[i]);
