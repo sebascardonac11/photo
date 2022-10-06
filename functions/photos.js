@@ -29,7 +29,7 @@ module.exports = class Photos {
                         Key: filePath,
                         Expires: 10
                     });
-                    photosDB[i].location = presignedURL;
+                    photosDB[i].Location = presignedURL;
                     console.log("Foto agregada",photosDB[i])
                     resPhoto.push(photosDB[i]);
                 }
@@ -39,10 +39,10 @@ module.exports = class Photos {
                 data: { Items: resPhoto }
             }
         } catch (error) {
-            console.log("Someting Wrong in Photo.getPhotosPerson ", error)
+            console.log("Someting Wrong in Photos.getPhotosPerson ", error)
             return {
                 statusCode: 400,
-                data: "Someting Wrong in Photo.getPhotosPerson "
+                data: "Someting Wrong in Photos.getPhotosPerson "
             };
         }
     }
