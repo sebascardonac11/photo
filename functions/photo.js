@@ -169,10 +169,9 @@ module.exports = class Photo {
                     resPhoto.push(photosDB.Items[i]);
                 }
             }
-            console.log("resPhoto", resPhoto)
             return {
                 statusCode: 200,
-                data: { Items: resPhoto }
+                data: resPhoto
             }
         } catch (error) {
             console.log("Someting Wrong in Photo.getPhotosPerson ", error)
