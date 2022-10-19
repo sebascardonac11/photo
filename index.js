@@ -43,7 +43,6 @@ exports.handler = async function (event, context, callback) {
         response = await analyzePhoto.analyse(Key);
       }
       return response;
-      break;
   }
   console.log("Response: ", response);
   return {
