@@ -52,7 +52,7 @@ module.exports = class Photos {
             for (const i in photosDB) {
                 const presignedURL = s3Client.getSignedUrl('getObject', {
                     Bucket: this.BUCKET,
-                    Key: photosDB[i].Key,
+                    Key: photosDB[i].PhotoID+'.jpg',
                     Expires: 10
                 });
                 photosDB[i].Location = presignedURL;
@@ -62,10 +62,10 @@ module.exports = class Photos {
                 data: photosDB
             }
         } catch (error) {
-            console.log("Someting Wrong in Photo.getPhotosSession ", error)
+            console.log("Someting Wrong in Photos.getPhotosSession ", error)
             return {
                 statusCode: 400,
-                data: "Someting Wrong in Photo.getPhotosSession "
+                data: "Someting Wrong in Photos.getPhotosSession "
             };
         }
     }
