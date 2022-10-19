@@ -53,7 +53,7 @@ module.exports = class Photos {
                 const presignedURL = s3Client.getSignedUrl('getObject', {
                     Bucket: this.BUCKET,
                     Key: photosDB[i].PhotoID+'.jpg',
-                    Expires: 10
+                    Expires: 100
                 });
                 photosDB[i].Location = presignedURL;
             }
