@@ -25,4 +25,8 @@ var event = {
 
 //var SessionID='SESSION-8295f7d0-40a1-4a3f-92a6-758d9a3322de'
 //console.log(SessionID.split('SESSION-'));
-index.handler(event,{},{});
+//index.handler(event,{},{});
+var key= "photoClient/EVENT-12bf90bf-95a6-4692-bc04-4b19a5b0aa65/SESSION-7c246f59-2d22-4278-9fa3-48d06601172e/SCC_0530.jpg";
+key = key.replace('photoClient', 'thumbnail').toUpperCase();
+key.toUpperCase();
+console.log(key);

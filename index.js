@@ -2,6 +2,7 @@ const Photo = require('./functions/photo')
 const jwt_decode = require('jwt-decode');
 const parser = require('lambda-multipart-parser');
 const handlerAnalyze = require('./functions/handlerAnalyze');
+const Photos = require('./functions/photos');
 exports.handler = async function (event, context, callback) {
   console.log("Event Photo: ", JSON.stringify(event));
   var photo = new Photo(process.env.BUCKET, process.env.DYNAMODB);
@@ -17,10 +18,26 @@ exports.handler = async function (event, context, callback) {
       var body = Buffer.from(form.files[0].content);
       response = await photo.putPhoto(form.files[0].filename, contenType, body, authorizationDecoded.email, form.event, form.session);
       break;
+    case 'GET':
+      console.log("### GET ####");
+      if (event.resource == '/photos') {
+        var photos = new Photos(process.env.BUCKET, process.env.DYNAMODB);
+        response = await photos.getPhotosSession(
+          event.queryStringParameters.session,
+          event.queryStringParameters.event
+          )
+      }
+      if (event.resource == '/photos/person') {
+        var photos = new Photos(process.env.BUCKET, process.env.DYNAMODB);
+        response = await photos.getPhotosPerson(event.queryStringParameters.event,event.queryStringParameters.number)
+      }
+      
+      break;
     default:
+      
       console.log("### ANALYZE PHOTO ####");
       //var analyzePhoto=new handlerAnalyze(event,'photoeventdev','photoEvent');
-      var analyzePhoto=new handlerAnalyze(event,process.env.BUCKET, process.env.DYNAMODB);
+      var analyzePhoto = new handlerAnalyze(event, process.env.BUCKET, process.env.DYNAMODB);
       for (const i in event.Records) {
         const Key = event.Records[i].s3.object.key;
         response = await analyzePhoto.analyse(Key);

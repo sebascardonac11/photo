@@ -4,6 +4,7 @@ on:
     branches:
     - feature/analyse
     - feature/putPhoto
+    - feature/searchPerson
 env:
   enviromentName: dev
 jobs:

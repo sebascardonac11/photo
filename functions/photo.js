@@ -1,6 +1,9 @@
 const AWS = require('aws-sdk');
 //AWS.config.update({ region: 'us-east-2' });
-
+AWS.config.update({
+    maxRetries: 15,
+    retryDelayOptions: { base: 500 }
+});
 const s3Client = new AWS.S3();
 const dynamo = new AWS.DynamoDB.DocumentClient();
 const Str = require('@supercharge/strings');
@@ -13,6 +16,7 @@ module.exports = class Photo {
     Photographer;
     FileName;
     Location;
+    Date;
     Event;
     Lables = [];
     Texts = [];
@@ -22,13 +26,26 @@ module.exports = class Photo {
         this.DYNAMODBTABLE = table
         this.Entity = 'PHOTO';
     }
+    async loadPhotoFromJson(obj) {
+        this.SessionID = obj['session'];
+        this.Key = obj['filePath'];
+        this.PhotoID = obj['mainsort'];
+        this.Photographer = obj['photographer'];
+        this.FileName = obj['name'];
+        this.Location = obj['location'];
+        this.Event = obj['mainkey'];
+        this.Lables = obj['labels'];
+        this.Texts = obj['texts'];
+        this.Numbers = obj['numbers'];
+        this.Date = obj['date']
+    }
     async loadDB() {
         try {
             var params = {
                 TableName: this.DYNAMODBTABLE,
                 KeyConditionExpression: 'mainkey = :hashKey and mainsort = :hasSort',
                 ExpressionAttributeValues: {
-                    ':hashKey': this.SessionID,
+                    ':hashKey': this.Event,
                     ':hasSort': this.PhotoID
                 }
             }
@@ -36,6 +53,7 @@ module.exports = class Photo {
             if (thisPhoto.Count > 0) {
                 this.Location = thisPhoto.Items[0].location
                 this.FileName = thisPhoto.Items[0].name
+                this.Date = thisPhoto.Items[0].date
             }
         } catch (error) {
             console.log("Someting Wrong in Photo.loadDB ", error)
@@ -44,13 +62,15 @@ module.exports = class Photo {
     }
     async putPhoto(fileName, contentType, body, email, event, session) {
         try {
+            var date = new Date();
+            this.Date= date.getUTCFullYear() + '/' + date.getMonth() + '/' + date.getDay();
             this.SessionID = session;
             this.Photographer = email;
             this.Event = event
             this.FileName = fileName
             const uuid = Str.uuid();
             this.PhotoID = 'PHOTO-' + uuid;
-            var filePath = "photoClient/" + event + "/" + session + "/" + fileName;
+            var filePath = "photoClient/" + event + "/" + session + "/" + PhotoID;
             var params = {
                 Bucket: this.BUCKET,
                 Body: body,
@@ -80,11 +100,11 @@ module.exports = class Photo {
     }
     async saveDB() {
         try {
-            var date = new Date();
+            
             var item = {
                 'mainkey': this.Event,
                 'mainsort': this.PhotoID,
-                'date':date.getUTCFullYear()+'/'+date.getMonth()+'/'+date.getDay(),
+                'date': this.Date,
                 'entity': this.Entity,
                 'photographer': this.Photographer,
                 'session': this.SessionID,
@@ -92,8 +112,8 @@ module.exports = class Photo {
                 'filePath': this.Key,
                 'location': this.Location,
                 'numbers': this.Numbers,
-                'texts':this.Texts,
-                'labels':this.Lables
+                'texts': this.Texts,
+                'labels': this.Lables
             }
             var params = {
                 TableName: this.DYNAMODBTABLE,
@@ -108,7 +128,7 @@ module.exports = class Photo {
             };
         }
     }
-    async loadMeta(key, texts,numbers, labels) {
+    async loadMeta(key, texts, numbers, labels) {
         try {
             var metadata = await s3Client.headObject({ Bucket: this.BUCKET, Key: key }).promise();
             this.SessionID = metadata.Metadata.session;
@@ -118,24 +138,82 @@ module.exports = class Photo {
             this.Key = key;
             this.Texts.push(texts);
             this.Lables.push(labels);
-            this.Numbers=numbers
+            this.Numbers = numbers
             await this.loadDB();
-            s3Client.putObjectTagging({
-                Bucket: this.BUCKET, Key: key,
-                Tagging: {
-                    TagSet: [
-                        {
-                            Key: "Labels",
-                            Value: labels
-                        },
-                        {
-                            Key: "Texts",
-                            Value: texts
-                        },]
-                }
-            }).promise();
+         
         } catch (error) {
             console.log("Something wrong in photo.loadMeta: ", error)
         }
+    }
+    async findPerson(number) {
+        var isPerson = false;
+        for (const key in this.Numbers) {
+            if (this.Numbers[key] == number)
+                isPerson = true;
+        }
+        return isPerson;
+    }
+    async createThumbnail() {
+        const sharp = require('sharp');
+        // Download the image from the S3 source bucket.
+        try {
+            const params = {
+                Bucket: this.BUCKET,
+                Key: this.Key
+            };
+            var origimage = await s3Client.getObject(params).promise();
+
+        } catch (error) {
+            console.log(error);
+            return;
+        }
+
+        // set thumbnail width. Resize will set the height automatically to maintain aspect ratio.
+        const width = 200;
+        // Use the sharp module to resize the image and save in a buffer.
+        try {
+            var buffer = await sharp(origimage.Body).resize(width).toBuffer();
+
+        } catch (error) {
+            console.log(error);
+            return;
+        }
+        // Upload the thumbnail image to the destination bucket
+        try {
+            var filePath = "thumbnail/" + this.Event + "/" + this.SessionID + "/" + this.FileName;
+            const destparams = {
+                Bucket: this.BUCKET,
+                Key: filePath,
+                Body: buffer,
+                ContentType: "image"
+            };
+            console.log("Img thumbnail",destparams)
+            const putResult = await s3Client.putObject(destparams).promise();
+        } catch (error) {
+            console.log(error);
+            return;
+        }
+    }
+    async addTags(texts, labels){
+        try {
+            
+        await s3Client.putObjectTagging({
+            Bucket: this.BUCKET, Key: key,
+            Tagging: {
+                TagSet: [
+                    {
+                        Key: "Labels",
+                        Value: labels
+                    },
+                    {
+                        Key: "Texts",
+                        Value: texts
+                    },]
+            }
+        }).promise();
+    } catch (error) {
+        console.log("Something wrong in photo.addTags: ", error)
+        console.log(labels,texts)
+    }
     }
 }

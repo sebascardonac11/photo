@@ -25,7 +25,10 @@ module.exports = class handlerAnalyze {
             var labels = await this.findRekognitionLabels(key);
             var photo = new Photo(this.bucket, this.table);
             await photo.loadMeta(key, texts.texts,texts.arrayNumbers, labels.labelsTags);
-            photo.saveDB();
+            console.log("handlerAnalyze.analyse.photo",photo)
+            await photo.createThumbnail();
+            photo.addTags(texts.texts, labels.labelsTags)
+            await photo.saveDB();
 
             //Get persons of sessions
             var personsDB = await this.getPersons(photo.SessionID, photo)
@@ -135,9 +138,8 @@ module.exports = class handlerAnalyze {
             var numbers=""
             var arrayNumbers = []
             data.TextDetections.forEach(text => {
-                const onlyLetters = text.DetectedText.replace(/[0-9]+/g, ""); // esto retorna 'abcd'
+                const onlyLetters = text.DetectedText.replace(/[0-9]+/g, "").toUpperCase(); // esto retorna 'abcd'
                 const onlyNumbers = text.DetectedText.replace(/[^0-9]+/g, "");
-                onlyLetters.toUpperCase;
                 if (texts.search(onlyLetters) == -1 && onlyLetters != '') {
                     texts += onlyLetters + "-";
                     arrayTexts.push(onlyLetters);
