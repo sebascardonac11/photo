@@ -30,7 +30,6 @@ module.exports = class Photos {
                         Expires: 10
                     });
                     photosDB[i].Location = presignedURL;
-                    console.log("Foto agregada", photosDB[i])
                     resPhoto.push(photosDB[i]);
                 }
             }
@@ -50,7 +49,6 @@ module.exports = class Photos {
         try {
             var photosDB = await this.getPhotoEvent(event);
             for (const i in photosDB) {
-                console.log(photosDB[i].Key);
                 const presignedURL = s3Client.getSignedUrl('getObject', {
                     Bucket: this.BUCKET,
                     Key: photosDB[i].Key,
@@ -94,7 +92,6 @@ module.exports = class Photos {
             var photos = [];
             for (const i in photosDB.Items) {
                 var photo = new Photo(this.BUCKET, this.DYNAMODBTABLE);
-                console.log(photo)
                 photo.loadPhotoFromJson(photosDB.Items[i]);
                 photos.push(photo);
             }
