@@ -94,6 +94,7 @@ module.exports = class Photos {
             var photos = [];
             for (const i in photosDB.Items) {
                 var photo = new Photo(this.BUCKET, this.DYNAMODBTABLE);
+                console.log(photo)
                 photo.loadPhotoFromJson(photosDB.Items[i]);
                 photos.push(photo);
             }
