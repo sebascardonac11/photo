@@ -50,10 +50,10 @@ module.exports = class Photos {
         try {
             var photosDB = await this.getPhotoEvent(event);
             for (const i in photosDB) {
-                console.log(photosDB[i].Location);
+                console.log(photosDB[i].Key);
                 const presignedURL = s3Client.getSignedUrl('getObject', {
                     Bucket: this.BUCKET,
-                    Key: photosDB[i].Location,
+                    Key: photosDB[i].Key,
                     Expires: 100
                 });
                 photosDB[i].Location = presignedURL;
